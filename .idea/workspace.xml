@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" name="Default" comment="init">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ar.iws" />
@@ -17,7 +16,7 @@
     <file path="/bonuses.js" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1377851963326" ignored="false" />
     <file path="/a.dummy" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378282507856" ignored="false" />
     <file path="/utils.js" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378276822445" ignored="false" />
-    <file path="/Dummy.txt" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378350647064" ignored="false" />
+    <file path="/Dummy.txt" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378350772855" ignored="false" />
     <file path="/c.css" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1377843318932" ignored="false" />
     <file path="$PROJECT_DIR$/../../ava/src/LP/BackendBundle/Form/Type/VendorFormType.php" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1377849765716" ignored="false" />
     <file path="$PROJECT_DIR$/../../ava/src/LP/BackendBundle/Resources/views/Vendor/Crud/edit.html.twig" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1377849521765" ignored="false" />
@@ -27,6 +26,7 @@
     <file path="/editor.js" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378288323391" ignored="false" />
     <file path="/e.css" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378286801070" ignored="false" />
     <file path="/1.js" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378288543225" ignored="false" />
+    <file path="/gitignore" changelist="a21841ab-cb12-41a3-9bcd-9f0a27cf685a" time="1378350711656" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,15 +50,6 @@
         <entry file="file://$PROJECT_DIR$/objects.js">
           <provider selected="true" editor-type-id="text-editor">
             <state line="205" column="0" selection-start="5026" selection-end="5026" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sprites.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sprites.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="4" selection-start="4" selection-end="4" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -91,10 +82,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="j.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="j.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/j.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="69" column="28" selection-start="1662" selection-end="1662" vertical-scroll-proportion="0.016968327">
+            <state line="69" column="28" selection-start="1662" selection-end="1662" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="6" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -168,6 +168,7 @@
         <option value="$PROJECT_DIR$/levels/1.js" />
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/j.js" />
+        <option value="$PROJECT_DIR$/gitignore" />
       </list>
     </option>
   </component>
@@ -185,7 +186,7 @@
     <OptionsSetting value="true" id="Update" />
     <OptionsSetting value="true" id="Status" />
     <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="2" id="Add" />
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
@@ -219,34 +220,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="ar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="levels" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ar" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="css" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -317,12 +290,22 @@
       <created>1377491905155</created>
       <updated>1377491905155</updated>
     </task>
+    <task id="LOCAL-00001" summary="init">
+      <created>1378350654207</created>
+      <updated>1378350654207</updated>
+    </task>
+    <task id="LOCAL-00002" summary="init">
+      <created>1378350768329</created>
+      <updated>1378350768329</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="24" width="1922" height="1033" extended-state="6" />
     <editor active="false" />
     <layout>
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -346,7 +329,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="false" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_NEW_TODO" value="true" />
     <option name="myTodoPanelSettings">
@@ -384,7 +367,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="LAST_COMMIT_MESSAGE" value="init" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -398,16 +381,12 @@
     <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="init" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/artists.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="36" selection-start="538" selection-end="539" vertical-scroll-proportion="0.30513918" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/css/c.css">
       <provider selected="true" editor-type-id="text-editor">
         <state line="48" column="1" selection-start="619" selection-end="619" vertical-scroll-proportion="0.0">
@@ -508,7 +487,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/j.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="28" selection-start="1662" selection-end="1662" vertical-scroll-proportion="0.016968327">
+        <state line="69" column="28" selection-start="1662" selection-end="1662" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="6" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
