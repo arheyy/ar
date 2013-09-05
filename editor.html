@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <title>1</title>
+
+    <link href="css/e.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="editor.js"></script>
+    <script type="text/javascript" src="const.js"></script>
+    <script type="text/javascript" src="objects.js"></script>
+    <script type="text/javascript" src="sprites.js"></script>
+    <!--<script type="text/javascript" src="artists.js"></script>-->
+    <!--<script type="text/javascript" src="behaviors.js"></script>-->
+    <!--<script type="text/javascript" src="bonuses.js"></script>-->
+
+
+</head>
+<body>
+
+<!--<div id="buttons">-->
+<!--<button onclick="ar.bonusIncreasePad()">+ pad</button>-->
+<!--<button onclick="ar.bonusDecreasePad()">- pad</button>-->
+<!--<button onclick="ar.bonusTripleBall()">3</button>-->
+<!--<button onclick="ar.bonusIncreaseSpeed()">+ speed</button>-->
+<!--<button onclick="ar.bonusDecreaseSpeed()">- speed</button>-->
+<!--<button onclick="ar.saveGame()">save</button>-->
+<!--<button onclick="ar.loadGame()">load</button>-->
+<!--<button onclick="ar.loadDebugGame()">loadDebug</button>-->
+<!--<button onclick="ar.processOneFrame = true">oneFrame</button>-->
+<!--<button onclick="ar.balls[0].setSpeed(0.3)">0.3 speed</button>-->
+<!--</div>-->
+
+<div id="container">
+    <div id="game-cont">
+        <canvas id="scene" width="800" height="800"></canvas>
+        <div>
+            <textarea id="stage-code"></textarea>
+
+            <div id="js-buttons">
+                <button id="get-js">Get js</button>
+                <button id="load-js">Load js</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#get-js').on('click', function() {
+       $('#stage-code').text(editor.getLevelCode());
+    });
+</script>
+</body>
+</html>

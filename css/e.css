@@ -1,0 +1,46 @@
+*{
+    margin:0;
+    padding:0;
+}
+
+body {
+    min-height:1000px;
+}
+
+#container {
+    width:100%;
+    display:block;
+}
+
+#game-cont {
+    position:relative;
+    height:800px;
+    width:800px;
+    margin: 0 auto;
+}
+
+#scene {
+    background-color: white;
+    position:relative;
+}
+#stage-code {
+    width:700px;
+    height:100px;
+    display: inline-block;
+    vertical-align: top;
+}
+#js-buttons {
+    width:80px;
+    height:100px;
+    display: inline-block;
+    vertical-align: top;
+}
+#get-js {
+    width:92px;
+    height:30px;
+}
+#load-js {
+    width:92px;
+    height:30px;
+    margin-top:46px;
+}

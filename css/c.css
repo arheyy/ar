@@ -1,0 +1,49 @@
+*{
+    margin:0;
+    padding:0;
+}
+
+body {
+    min-height:1000px;
+}
+
+#container {
+    width:100%;
+    display:block;
+}
+
+#game-cont {
+    position:relative;
+    height:500px;
+    width:800px;
+    margin: 0 auto;
+}
+
+#buttons {
+    position: absolute;
+    width:60px;
+}
+#buttons button {
+    width:100px;
+    height:30px;
+}
+
+#scene {
+    /*background-image:url("1.jpg");*/
+    background-color: #C7D7DB;
+    position:relative;
+    /*cursor: none;*/
+}
+
+#fps {
+    position: absolute;
+    right:0;
+    bottom:0;
+    font-size:8px;
+}
+#frame-counter {
+    position: absolute;
+    right:100px;
+    bottom:0;
+    font-size:8px;
+}
