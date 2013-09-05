@@ -27,6 +27,7 @@ var Ar = function (canvasId) {
 
     // Images
     this.background = new Image();
+    this.spritesheet = new Image();
 
     // Meta
     this.ballData = {
@@ -64,16 +65,12 @@ Ar.prototype = {
     },
 
     loadLevel: function () {
-        $.getScript('levels/1.js', function (data, textStatus) {
-            c(data)
-            this.levelData = data;
-            c(this.levelData)
-        });
+        this.levelData = LEVELS[this.level];
     },
 
     start: function () {
         this.loadLevel();
-//        this.createObjects();
+        this.createObjects();
         this.initializeImages();
     },
 
@@ -83,8 +80,8 @@ Ar.prototype = {
         this.createBallObject();
         this.createPadObject();
 
-        for (var i = 0; i < this.bricksData.length; i++) {
-            this.createBrickObject(this.bricksData[i]);
+        for (var i = 0; i < this.levelData.length; i++) {
+            this.createBrickObject(this.levelData[i]);
         }
 
         this.createBonusObject({
@@ -175,7 +172,8 @@ Ar.prototype = {
     initializeImages: function () {
         var self = this;
         this.background.src = SPRITE_BACKGROUND_1;
-        SPRITE_SHEET.onload = function () {
+        this.spritesheet.src = SPRITE_SHEET_SRC;
+        this.spritesheet.onload = function () {
             self.startGame();
         };
     },
@@ -186,10 +184,6 @@ Ar.prototype = {
 
     pause: function () {
         this.paused = true;
-    },
-
-    unPause: function () {
-        this.paused = false;
     },
 
     togglePause: function () {
@@ -250,19 +244,17 @@ Ar.prototype = {
 ///////////////////////////////////////////
 
     drawBackground: function () {
-        this.context.opacity = 0.5;
+//        this.context.globalAlpha = 0.01;
         this.context.drawImage(this.background, 0, 0,
-            800, 400,
+            800, 600,
             0, 0,
-            800, 400);
+            800, 600);
+        this.context.globalAlpha = 1;
     },
 
     draw: function (now) {
         this.drawBackground();
-//        console.clear();
-//        c(this.balls[0]);
         this.updateObjects(now);
-//        c(this.balls[0]);
         this.drawObjects();
     },
 
@@ -289,13 +281,16 @@ Ar.prototype = {
     }
 }
 ;
-
 // Запуск
 var ar;
 
 $(function () {
+    ar = new Ar('scene');
+    ar.start();
 
-    // Обработчики собыйтий
+
+
+// Обработчики собыйтий
     window.onkeydown = function (event) {
         var key = event.keyCode;
 
@@ -349,10 +344,6 @@ $(function () {
 
         }
     });
-
-    ar = new Ar('scene');
-    ar.start();
-
 
     $('#buttons').css({
         top : $(ar.canvas).offset().top + 'px',

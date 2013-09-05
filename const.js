@@ -1,6 +1,4 @@
-var SPRITE_SHEET = new Image();
-SPRITE_SHEET.src = 'img/sprites.png';
-//SPRITE_SHEET.src = 'img/bonuses.png';
+var SPRITE_SHEET_SRC = 'img/sprites.png';
 
 var SPRITE_BACKGROUND_1 = 'img/background1.png';
 
@@ -54,7 +52,10 @@ var LEFT = 1;
 var RIGHT = 2;
 
 var SAVE_DATA_KEY = 'arSaveData';
-var DEBUG_SAVE_DATA_KEY = 'arDebugSaveData';
+
+var LEVELS_COUNT = 1;
+var LEVELS = [];
+
 //var DEBUG_STOP_ON_FRAME = false;
 //var DEBUG_STOP_ON_FRAME = 1;
 

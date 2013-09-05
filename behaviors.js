@@ -69,6 +69,7 @@ var moveBallBehavior = {
         var ballData = ball.getData();
         var horizontalIntersect = [];
         var verticalIntersect = [];
+
         for (var i = 0; i < ar.bricks.length; i++) {
             var brick = ar.bricks[i];
 
@@ -87,25 +88,39 @@ var moveBallBehavior = {
                     verticalIntersect = vertIntersect;
                 }
             }
-        }
 
-        if (horizontalIntersect.length && verticalIntersect.length) {
-            var kx = Math.abs(horizontalIntersect[0].x - verticalIntersect[0].x);
-            var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
-
-            if (equalPresision(kx, ky)) {
-                ball.invertXDirection();
-                ball.invertYDirection();
-            } else if (kx > ky) {
-                ball.invertYDirection();
-            } else {
-                ball.invertXDirection();
+            if (horizontalIntersect.length || verticalIntersect.length) {
+                brick.processTouch();
             }
-        } else if (horizontalIntersect.length) {
-            ball.invertYDirection();
-        } else if (verticalIntersect.length) {
-            ball.invertXDirection();
+
+            if (horizontalIntersect.length && verticalIntersect.length) {
+
+                var kx = Math.abs(horizontalIntersect[0].x - verticalIntersect[0].x);
+                var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
+
+                if (equalPresision(kx, ky)) {
+                    ball.invertXDirection();
+                    ball.invertYDirection();
+                } else if (kx > ky) {
+                    ball.invertYDirection();
+                } else {
+                    ball.invertXDirection();
+                }
+
+                return true;
+
+            } else if (horizontalIntersect.length) {
+                ball.invertYDirection();
+
+                return true;
+            } else if (verticalIntersect.length) {
+                ball.invertXDirection();
+
+                return true;
+            }
         }
+
+        return false;
     },
 
     processCollisions: function (ball) {

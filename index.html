@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8"/>
-    <title>1</title>
+    <title>a</title>
 
     <link href="css/c.css" rel="stylesheet" type="text/css"/>
 
@@ -16,6 +16,11 @@
     <script type="text/javascript" src="behaviors.js"></script>
     <script type="text/javascript" src="bonuses.js"></script>
 
+    <script>
+        for (var i = 1; i <= LEVELS_COUNT; i++) {
+            document.write('<script type="text/javascript" src="levels/' + i + '.js"><\/script>');
+        }
+    </script>
 
 </head>
 <body>
@@ -34,7 +39,7 @@
 
 <div id="container">
     <div id="game-cont">
-        <canvas id="scene" width="800" height="400"></canvas>
+        <canvas id="scene" width="800" height="600"></canvas>
         <div id="fps"></div>
         <div id="frame-counter">0</div>
     <div>

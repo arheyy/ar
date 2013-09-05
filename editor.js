@@ -173,20 +173,68 @@ Editor.prototype = {
         }
     },
 
-    processGridClick: function (point) {
-        if (this.previewBrick.color) {
-            var top = point.top - (point.top - CONTROL_PANEL_HEIGHT) % BRICK_HEIGHT;
-            var left = point.left - point.left % BRICK_WIDTH;
+    processGridClick: function (point, button, ctrl) {
 
-            var brick = new Brick({
-                left      : left,
-                top       : top,
-                color     : this.previewBrick.color,
-                lives     : this.previewBrick.lives,
-                stoneWalls: this.previewBrick.stoneWalls.slice(0)
-            });
+        var top = point.top - (point.top - CONTROL_PANEL_HEIGHT) % BRICK_HEIGHT;
+        var left = point.left - point.left % BRICK_WIDTH;
 
-            this.bricks.push(brick);
+        var brick;
+        for (var i = 0; i < this.bricks.length; i++) {
+            brick = this.bricks[i];
+            if (pointInObject(point, brick)) {
+
+                if (ctrl) {
+                    this.previewBrick.color = brick.color;
+                    this.previewBrick.lives = brick.lives;
+                    this.previewBrick.stoneWalls = brick.stoneWalls.slice(0);
+
+                    this.wallBorders = [];
+
+                    for (var j = 0; j < this.controls.length; j++) {
+                        var control = this.controls[j];
+
+                        if (control.color == this.previewBrick.color && control.lives == this.previewBrick.lives) {
+                            this.colorBorder = {
+                                left  : control.left - 3,
+                                top   : control.top - 3,
+                                width : control.width + 6,
+                                height: control.height + 6
+                            };
+                        }
+
+                        if (control.stoneWalls.length > 0) {
+                            if (this.previewBrick.stoneWalls.indexOf(control.stoneWalls[0]) != -1) {
+                                var wallBorder = {
+                                    left  : control.left - 3,
+                                    top   : control.top - 3,
+                                    width : control.width + 6,
+                                    height: control.height + 6
+                                };
+
+                                this.wallBorders.push(wallBorder);
+                            }
+                        }
+                    }
+                } else {
+                    this.bricks.splice(i, 1);
+                }
+
+            }
+        }
+
+        if (button == 0) {
+            if (this.previewBrick.color) {
+
+                brick = new Brick({
+                    left      : left,
+                    top       : top,
+                    color     : this.previewBrick.color,
+                    lives     : this.previewBrick.lives,
+                    stoneWalls: this.previewBrick.stoneWalls.slice(0)
+                });
+
+                this.bricks.push(brick);
+            }
         }
     },
 
@@ -266,7 +314,11 @@ $(function () {
     editor.start();
 });
 
-$(window).on('click', function (event) {
+var mousePressed = false;
+
+$(window).on('mousedown', function (event) {
+    mousePressed = event.button;
+
     if (event.pageX > editor.contextXLeft
         && event.pageX < editor.contextXRight
         && event.pageY > editor.contextYTop
@@ -279,7 +331,36 @@ $(window).on('click', function (event) {
         if (mTop < CONTROL_PANEL_HEIGHT) {
             editor.processControlsClick(new Point(mLeft, mTop));
         } else {
-            editor.processGridClick(new Point(mLeft, mTop));
+            editor.processGridClick(new Point(mLeft, mTop), event.button, event.ctrlKey);
         }
     }
 });
+
+$(window).on('mouseup', function (event) {
+    mousePressed = false;
+});
+
+$(window).on('mousemove', function (event) {
+    if (mousePressed !== false) {
+        if (event.pageX > editor.contextXLeft
+            && event.pageX < editor.contextXRight
+            && event.pageY > editor.contextYTop + CONTROL_PANEL_HEIGHT
+            && event.pageY < editor.contextYBot
+            ) {
+
+            var mLeft = event.pageX - editor.contextXLeft;
+            var mTop = event.pageY;
+            editor.processGridClick(new Point(mLeft, mTop), mousePressed, false);
+        }
+    }
+
+});
+
+
+
+//for (var i = 0; i < editor.bricks.length; i++) {
+//    for (var j = i + 1; j < editor.bricks.length; j++)
+//        if (editor.bricks[i].left == editor.bricks[j].left && (editor.bricks[i].top == editor.bricks[j].top) {
+//            console.log('error')
+//        }
+//}

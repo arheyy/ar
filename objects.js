@@ -4,7 +4,7 @@ var Ball = function (options) {
     this.height = BALL_NORMAL_SIZE;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
 
-//    options.ang = Math.PI * 145 / 180;
+    options.ang = Math.PI * 90 / 180;
 
     this.left = options.left;
     this.top = options.top;
@@ -21,7 +21,7 @@ var Ball = function (options) {
 
     this.visible = true;
 
-    this.artist = new SpriteSheetArtist(SPRITE_SHEET, SPRITE_ARRAY_BALL_NORMAL);
+    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BALL_NORMAL);
     this.behaviors = [
         moveBallBehavior,
         new CycleBehavior(100, 0)
@@ -138,7 +138,7 @@ var Pad = function (options) {
     this.visible = true;
     this.move = options.move || false;
 
-    this.artist = new SpritePadArtist(SPRITE_SHEET, SPRITE_ARRAY_PAD);
+    this.artist = new SpritePadArtist(ar.spritesheet, SPRITE_ARRAY_PAD);
     this.behaviors = [
         movePadBehavior
     ];
@@ -177,7 +177,7 @@ var Bonus = function (options) {
     this.dy = BONUS_SPEED;
     this.visible = true;
 
-    this.artist = new SpriteSheetArtist(SPRITE_SHEET, SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
+    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
     this.behaviors = [
         bonusBehavior,
         new CycleBehavior(100, 0)
@@ -217,7 +217,7 @@ var Brick = function (options) {
 
     this.visible = true;
 
-//    this.artist = new SpriteSheetArtist(SPRITE_SHEET, SPRITE_ARRAY_BRICK_1);
+//    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BRICK_1);
     this.behaviors = [
 
     ];
@@ -332,6 +332,13 @@ Brick.prototype = {
             context.stroke();
         }
 //        this.sprite.draw.call(this, context);
+    },
+
+    processTouch: function () {
+        this.lives--;
+        if (this.lives <= 0) {
+            ar.removeObject(this);
+        }
     },
 
     update: function (time, fps) {
