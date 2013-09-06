@@ -40,10 +40,12 @@ body {
     right:0;
     bottom:0;
     font-size:8px;
+    color:white;
 }
 #frame-counter {
     position: absolute;
-    right:100px;
+    right:50px;
     bottom:0;
     font-size:8px;
+    color:white;
 }

@@ -9,6 +9,7 @@ var Ball = function (options) {
     this.left = options.left;
     this.top = options.top;
     this.setAng(options.ang || rand(BALL_START_ANGEL_MIN, BALL_START_ANGEL_MAX));
+    this.alive = true;
 //
 //    this.speed = 2;
 //    this.left = 330;
@@ -19,15 +20,9 @@ var Ball = function (options) {
 //    this.dy = -10;
 
 
-    this.visible = true;
+    this.behaviors = [moveBallBehavior];
 
-    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BALL_NORMAL);
-    this.behaviors = [
-        moveBallBehavior,
-        new CycleBehavior(100, 0)
-    ];
-
-    this.sprite = new Sprite(this);
+    this.sprites = [new DynamicSprite(this, SPRITE_ARRAY_BALL_NORMAL, 150, 0)];
 };
 
 Ball.prototype = {
@@ -38,17 +33,20 @@ Ball.prototype = {
     },
 
     draw: function (context) {
-        this.sprite.draw.call(this, context);
-//        var data = this.getData();
-//        context.beginPath();
-//        context.strokeStyle = '#ff0000';
-//        context.moveTo(data.x, data.y);
-//        context.lineTo(data.x + 100 * this.dx, data.y + 100 * this.dy);
-//        context.stroke();
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].draw(context);
+        }
     },
 
-    update: function (time, fps) {
-        this.sprite.update.call(this, time, fps);
+    update: function (time) {
+        var i;
+        for (i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].update(time);
+        }
+
+        for (i = 0; i < this.behaviors.length; i++) {
+            this.behaviors[i].execute(this, time);
+        }
     },
 
     invertYDirection: function () {
@@ -64,7 +62,7 @@ Ball.prototype = {
     },
 
     isSideWallCollision: function () {
-        return (this.left + this.dx < 0 && this.dx < 0) || (this.left + this.dx + this.width > ar.contextWidth && this.dx > 0);
+        return (this.left + this.dx < 0 && this.dx < 0) || (this.left + this.dx + this.width > CONTEXT_WIDTH && this.dx > 0);
     },
 
     isTopWallCollision: function () {
@@ -72,7 +70,7 @@ Ball.prototype = {
     },
 
     isBotWallCollision: function () {
-        return this.top + this.dy + this.height > ar.contextHeight && this.dy > 0;
+        return this.top + this.dy + this.height > CONTEXT_HEIGHT && this.dy > 0;
     },
 
     move: function () {
@@ -132,14 +130,13 @@ Ball.prototype = {
 var Pad = function (options) {
     this.type = OBJECT_TYPE_PAD;
     this.setSize(options.size);
-    this.left = options.left || (ar.contextWidth - this.width) / 2;
+    this.left = options.left || (CONTEXT_WIDTH - this.width) / 2;
     this.height = PAD_HEIGHT;
-    this.top = options.top || (ar.contextHeight - PAD_HEIGHT);
-
-    this.visible = true;
+    this.top = options.top || (CONTEXT_HEIGHT - PAD_HEIGHT);
     this.move = options.move || false;
+    this.alive = true;
 
-    this.artist = new SpritePadArtist(ar.spritesheet, SPRITE_ARRAY_PAD);
+    this.artist = new SpritePadArtist(SPRITE_ARRAY_PAD);
     this.behaviors = [
         movePadBehavior
     ];
@@ -153,8 +150,8 @@ Pad.prototype = {
         this.size = size;
         this.width = PAD_CORNER_WIDTH * 2 + PAD_MIDDLE_WIDTH * this.size;
 
-        if (this.left + this.width > ar.contextWidth) {
-            this.left = ar.contextWidth - this.width;
+        if (this.left + this.width > CONTEXT_WIDTH) {
+            this.left = CONTEXT_WIDTH - this.width;
         }
     },
 
@@ -172,13 +169,12 @@ var Bonus = function (options) {
     this.effect = options.effect;
     this.width = BONUS_SIZE;
     this.height = BONUS_SIZE;
-
     this.left = options.left;
     this.top = options.top;
     this.dy = BONUS_SPEED;
-    this.visible = true;
+    this.alive = true;
 
-    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
+    this.artist = new SpriteSheetArtist(SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
     this.behaviors = [
         bonusBehavior,
         new CycleBehavior(100, 0)
@@ -207,177 +203,149 @@ var Brick = function (options) {
     this.type = OBJECT_TYPE_BRICK;
     this.width = BRICK_WIDTH;
     this.height = BRICK_HEIGHT;
-
     this.left = options.left;
     this.top = options.top;
-
-    ///// Not implemented
     this.color = options.color;
     this.lives = options.lives || BRICK_DEFAULT_LIVES;
     this.metalWalls = options.metalWalls || [];
+    this.alive = true;
 
-    this.visible = true;
+    this.behaviors = [];
 
-//    this.artist = new SpriteSheetArtist(ar.spritesheet, SPRITE_ARRAY_BRICK_1);
-    this.behaviors = [
-
+    this.sprites = [
+        new StaticSprite(this, SPRITE_BRICK_5),
+        new StaticSprite(this, SPRITE_BROKEN_1),
+        new MetalWallSprite(this, SPRITE_METAL_WALL)
     ];
-
-    this.sprite = new Sprite(this);
-
 };
 
 Brick.prototype = {
 
     draw: function (context) {
-        var style;
-        switch (this.color) {
-            case 'green':
-                switch (this.lives) {
-                    case 1:
-                        style = '#00FF66';
-                        break;
-                    case 2:
-                        style = '#339933';
-                        break;
-                    default:
-                        style = '#006600';
-                        break;
-                }
-                break;
-            case 'blue':
-                switch (this.lives) {
-                    case 1:
-                        style = '#6699FF';
-                        break;
-                    case 2:
-                        style = '#0033FF';
-                        break;
-                    default:
-                        style = '#003399';
-                        break;
-                }
-                break;
-            case 'yellow':
-                switch (this.lives) {
-                    case 1:
-                        style = '#FFCC33';
-                        break;
-                    case 2:
-                        style = '#CCCC00';
-                        break;
-                    default:
-                        style = '#CC9900';
-                        break;
-                }
-                break;
-            case 'purple':
-                switch (this.lives) {
-                    case 1:
-                        style = '#FF33FF';
-                        break;
-                    case 2:
-                        style = '#996699';
-                        break;
-                    default:
-                        style = '#660066';
-                        break;
-                }
-                break;
-            case null:
-                style = '#DDDDDD';
-                break;
-        }
+//        var style;
+//        switch (this.color) {
+//            case 'green':
+//                switch (this.lives) {
+//                    case 1:
+//                        style = '#00FF66';
+//                        break;
+//                    case 2:
+//                        style = '#339933';
+//                        break;
+//                    default:
+//                        style = '#006600';
+//                        break;
+//                }
+//                break;
+//            case 'blue':
+//                switch (this.lives) {
+//                    case 1:
+//                        style = '#6699FF';
+//                        break;
+//                    case 2:
+//                        style = '#0033FF';
+//                        break;
+//                    default:
+//                        style = '#003399';
+//                        break;
+//                }
+//                break;
+//            case 'yellow':
+//                switch (this.lives) {
+//                    case 1:
+//                        style = '#FFCC33';
+//                        break;
+//                    case 2:
+//                        style = '#CCCC00';
+//                        break;
+//                    default:
+//                        style = '#CC9900';
+//                        break;
+//                }
+//                break;
+//            case 'purple':
+//                switch (this.lives) {
+//                    case 1:
+//                        style = '#FF33FF';
+//                        break;
+//                    case 2:
+//                        style = '#996699';
+//                        break;
+//                    default:
+//                        style = '#660066';
+//                        break;
+//                }
+//                break;
+//            case null:
+//                style = '#DDDDDD';
+//                break;
+//        }
+//
+//        context.beginPath();
+//        context.fillStyle = style;
+//        context.fillRect(this.left, this.top, this.width, this.height);
 
-        context.beginPath();
-        context.fillStyle = style;
-        context.fillRect(this.left, this.top, this.width, this.height);
-        context.lineWidth = 2;
-        context.strokeStyle = '#3399CC';
-        context.rect(this.left, this.top, this.width, this.height);
-        context.stroke();
-
-        if (this.metalWalls.indexOf('top') != -1) {
-            context.beginPath();
-            context.strokeStyle = 'black';
-            context.lineWidth = 2;
-            context.moveTo(this.left, this.top);
-            context.lineTo(this.left + this.width, this.top);
-            context.stroke();
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].draw(context);
         }
-
-        if (this.metalWalls.indexOf('bot') != -1) {
-            context.beginPath();
-            context.strokeStyle = 'black';
-            context.lineWidth = 2;
-            context.moveTo(this.left, this.top + this.height);
-            context.lineTo(this.left + this.width, this.top + this.height);
-            context.stroke();
-        }
-
-        if (this.metalWalls.indexOf('left') != -1) {
-            context.beginPath();
-            context.strokeStyle = 'black';
-            context.lineWidth = 2;
-            context.moveTo(this.left, this.top);
-            context.lineTo(this.left, this.top + this.height);
-            context.stroke();
-        }
-
-        if (this.metalWalls.indexOf('right') != -1) {
-            context.beginPath();
-            context.strokeStyle = 'black';
-            context.lineWidth = 2;
-            context.moveTo(this.left + this.width, this.top);
-            context.lineTo(this.left + this.width, this.top + this.height);
-            context.stroke();
-        }
-//        this.sprite.draw.call(this, context);
     },
 
-    processTouch: function () {
+    processTouch: function (touchSide) {
+        if ((touchSide.length == 2) && (this.hasMetalWall(touchSide[0]) || this.hasMetalWall(touchSide[1]))) {
+            return false;
+        } else if (this.hasMetalWall(touchSide)) {
+            return false;
+        }
+
         this.lives--;
+
+        return true;
+    },
+
+    update: function (time) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].update(time);
+        }
         if (this.lives <= 0) {
-            ar.removeObject(this);
+            this.alive = false;
         }
     },
 
-    update: function (time, fps) {
-        this.sprite.update.call(this, time, fps);
+    hasMetalWall: function (side) {
+        return this.metalWalls.indexOf(side) != -1;
     },
 
-    getBotLine  : function () {
-        return {
-            x1: this.left,
-            y1: this.top + this.height,
-            x2: this.left + this.width,
-            y2: this.top + this.height
-        };
-    },
-    getTopLine  : function () {
-        return {
-            x1: this.left,
-            y1: this.top,
-            x2: this.left + this.width,
-            y2: this.top
-        };
-    },
-    getLeftLine : function () {
-        return {
-            x1: this.left,
-            y1: this.top,
-            x2: this.left,
-            y2: this.top + this.height
-        };
-    },
-    getRightLine: function () {
-        return {
-            x1: this.left + this.width,
-            y1: this.top,
-            x2: this.left + this.width,
-            y2: this.top + this.height
-        };
+    getSideLine  : function (side) {
+        switch (side) {
+            case TOP:
+                return {
+                    x1: this.left,
+                    y1: this.top,
+                    x2: this.left + this.width,
+                    y2: this.top
+                };
+            case BOT:
+                return {
+                    x1: this.left,
+                    y1: this.top + this.height,
+                    x2: this.left + this.width,
+                    y2: this.top + this.height
+                };
+            case LEFT:
+                return {
+                    x1: this.left,
+                    y1: this.top,
+                    x2: this.left,
+                    y2: this.top + this.height
+                };
+            case RIGHT:
+                return {
+                    x1: this.left + this.width,
+                    y1: this.top,
+                    x2: this.left + this.width,
+                    y2: this.top + this.height
+                };
+        }
     }
-
 
 };

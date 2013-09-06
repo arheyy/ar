@@ -38,43 +38,41 @@ Editor.prototype = {
 
     createControls: function () {
         var i;
-        for (i = 0; i < BRICK_COLORS.length; i++) {
-            for (var j = 0; j < 3; j++) {
-                this.controls.push(new Brick({
-                    left : i * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-                    top  : BRICK_TOP_OFFSET + j * (BRICK_HEIGHT + BRICK_TOP_OFFSET),
-                    lives: j + 1,
-                    color: BRICK_COLORS[i]
-                }));
-            }
+        for (i = 0; i < SPRITE_BRICKS.length; i++) {
+            this.controls.push(new Brick({
+                left : i * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+                top  : BRICK_TOP_OFFSET + j * (BRICK_HEIGHT + BRICK_TOP_OFFSET),
+                lives: j + 1,
+                color: BRICK_COLORS[i]
+            }));
         }
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            metalWalls: ['top']
+            metalWalls: [TOP]
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 1) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            metalWalls: ['bot']
+            metalWalls: [BOT]
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 2) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            metalWalls: ['left']
+            metalWalls: [LEFT]
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 3) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            metalWalls: ['right']
+            metalWalls: [RIGHT]
         }));
 
         this.previewBrick = new Brick({
@@ -150,6 +148,7 @@ Editor.prototype = {
                 }
 
                 if (control.metalWalls.length > 0) {
+
                     var wallBorder = {
                         left  : control.left - 3,
                         top   : control.top - 3,
@@ -157,15 +156,33 @@ Editor.prototype = {
                         height: control.height + 6
                     };
 
-                    var wall = control.metalWalls[0];
-                    var wallIndex = this.previewBrick.metalWalls.indexOf(wall);
-                    if (wallIndex == -1) {
-                        this.wallBorders.push(wallBorder);
-                        this.previewBrick.metalWalls.push(wall);
+                    var side = control.metalWalls[0];
+                    if (this.previewBrick.hasMetalWall(side)) {
+                        this.previewBrick.metalWalls.splice(this.previewBrick.metalWalls.indexOf(side), 1);
+
+                        for (var j = 0; j < this.wallBorders.length; j++) {
+                            if (this.wallBorders[j].left == wallBorder.left && this.wallBorders[j].top == wallBorder.top) {
+                                this.wallBorders.splice(j, 1);
+                                break;
+                            }
+                        }
+
                     } else {
-                        this.wallBorders.splice(this.wallBorders.indexOf(wallBorder), 1);
-                        this.previewBrick.metalWalls.splice(wallIndex, 1);
+                        this.previewBrick.metalWalls.push(side);
+                        this.wallBorders.push(wallBorder);
+
                     }
+
+//
+//                    var wall = control.metalWalls[0];
+//                    var wallIndex = this.previewBrick.metalWalls.indexOf(wall);
+//                    if (!this.previewBrick.hasMetalWall(wall)) {
+//                        this.wallBorders.push(wallBorder);
+//                        this.previewBrick.metalWalls.push(wall);
+//                    } else {
+//                        this.wallBorders.splice(this.wallBorders.indexOf(wallBorder), 1);
+//                        this.previewBrick.metalWalls.splice(wallIndex, 1);
+//                    }
                 }
 
                 return;
@@ -203,7 +220,7 @@ Editor.prototype = {
                         }
 
                         if (control.metalWalls.length > 0) {
-                            if (this.previewBrick.metalWalls.indexOf(control.metalWalls[0]) != -1) {
+                            if (this.previewBrick.hasMetalWall(control.metalWalls[0])) {
                                 var wallBorder = {
                                     left  : control.left - 3,
                                     top   : control.top - 3,
@@ -278,6 +295,13 @@ Editor.prototype = {
     },
 
     start: function () {
+        SPRITESHEET.src = SPRITESHEET_SRC;
+        SPRITESHEET.onload = function () {
+            editor.startEditor();
+        };
+    },
+
+    startEditor: function () {
         this.createControls();
         requestAnimationFrame(this.animate);
     },
@@ -301,6 +325,22 @@ Editor.prototype = {
         }
 
         return 'LEVELS.push(' + JSON.stringify(res) + ');';
+    },
+
+    loadLevelCode: function (code) {
+        var LEVELS = [];
+        eval(code);
+
+        for (var i = 0; i < LEVELS[0].length; i++) {
+            var brick = LEVELS[0][i];
+            this.bricks.push(new Brick({
+                left      : brick.left,
+                top       : brick.top + CONTROL_PANEL_HEIGHT,
+                color     : brick.color,
+                lives     : brick.lives,
+                metalWalls: brick.metalWalls
+            }));
+        }
     }
 }
 ;
@@ -355,7 +395,6 @@ $(window).on('mousemove', function (event) {
     }
 
 });
-
 
 
 //for (var i = 0; i < editor.bricks.length; i++) {

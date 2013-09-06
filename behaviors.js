@@ -1,31 +1,6 @@
-CycleBehavior = function (interval, delay) {
-    this.interval = interval || 0;  //  milliseconds
-    this.delay = delay || 0;
-    this.lastAdvance = 0;
-};
-
-CycleBehavior.prototype = {
-    execute: function (sprite, time, fps) {
-        if (this.lastAdvance === 0) {
-            this.lastAdvance = time;
-        }
-
-        if (this.delay && sprite.artist.cellIndex === 0) {
-            if (time - this.lastAdvance > this.delay) {
-                sprite.artist.advance();
-                this.lastAdvance = time;
-            }
-        }
-        else if (time - this.lastAdvance > this.interval) {
-            sprite.artist.advance();
-            this.lastAdvance = time;
-        }
-    }
-};
-
 var moveBallBehavior = {
 
-    processWallsCollisions:function(ball) {
+    processWallsCollisions: function (ball) {
         if (ball.isSideWallCollision()) {// Столкновение с боковыми стенками
             ball.invertXDirection();
             return true;
@@ -67,31 +42,21 @@ var moveBallBehavior = {
     processBricksCollisions: function (ball) {
         // Столкновение с кирпичами
         var ballData = ball.getData();
-        var horizontalIntersect = [];
-        var verticalIntersect = [];
+        var horizontalIntersect;
+        var verticalIntersect;
+        var touchSide = false;
 
         for (var i = 0; i < ar.bricks.length; i++) {
             var brick = ar.bricks[i];
 
-            if (horizontalIntersect.length == 0) {
-                var horizontalLine = ball.dy > 0 ? brick.getTopLine() : brick.getBotLine();
-                var horIntersect = isBallHorizontalIntersected(ballData, horizontalLine);
-                if (horIntersect) {
-                    horizontalIntersect = horIntersect;
-                }
-            }
+            var horizontalSide = ball.dy > 0 ? TOP : BOT;
+            var verticalSide = ball.dx > 0 ? LEFT : RIGHT;
 
-            if (verticalIntersect.length == 0) {
-                var verticalLine = ball.dx > 0 ? brick.getLeftLine() : brick.getRightLine();
-                var vertIntersect = isBallVerticalIntersected(ballData, verticalLine);
-                if (vertIntersect) {
-                    verticalIntersect = vertIntersect;
-                }
-            }
+            var horizontalLine = brick.getSideLine(horizontalSide);
+            var verticalLine = brick.getSideLine(verticalSide);
 
-            if (horizontalIntersect.length || verticalIntersect.length) {
-                brick.processTouch();
-            }
+            horizontalIntersect = isBallHorizontalIntersected(ballData, horizontalLine);
+            verticalIntersect = isBallVerticalIntersected(ballData, verticalLine);
 
             if (horizontalIntersect.length && verticalIntersect.length) {
 
@@ -99,23 +64,37 @@ var moveBallBehavior = {
                 var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
 
                 if (equalPresision(kx, ky)) {
+
                     ball.invertXDirection();
                     ball.invertYDirection();
+                    touchSide = [horizontalSide, verticalSide];
+
                 } else if (kx > ky) {
+
                     ball.invertYDirection();
+                    touchSide = horizontalSide;
+
                 } else {
+
                     ball.invertXDirection();
+                    touchSide = verticalSide;
+
                 }
 
-                return true;
-
             } else if (horizontalIntersect.length) {
+
                 ball.invertYDirection();
+                touchSide = horizontalSide;
 
-                return true;
             } else if (verticalIntersect.length) {
-                ball.invertXDirection();
 
+                ball.invertXDirection();
+                touchSide = verticalSide;
+
+            }
+
+            if (touchSide !== false) {
+                brick.processTouch(touchSide);
                 return true;
             }
         }
@@ -135,7 +114,7 @@ var moveBallBehavior = {
         return false;
     },
 
-    execute: function (ball, time, fps) {
+    execute: function (ball) {
         this.processCollisions(ball);
         ball.move();
 
@@ -144,23 +123,23 @@ var moveBallBehavior = {
 
 var movePadBehavior = {
 
-    execute: function (sprite, time, fps) {
+    execute: function (pad) {
 
-        if (sprite.moveDevice == DEVICE_KEYBOARD) {
+        if (pad.moveDevice == DEVICE_KEYBOARD) {
 
-            if (sprite.moveOption == LEFT) {
-                sprite.left = Math.max(sprite.left - PAD_MOVE_DELTA, 0);
-            } else if (sprite.moveOption == RIGHT) {
-                sprite.left = Math.min(sprite.left + PAD_MOVE_DELTA, ar.contextWidth - sprite.width);
+            if (pad.moveOption == LEFT) {
+                pad.left = Math.max(pad.left - PAD_MOVE_DELTA, 0);
+            } else if (pad.moveOption == RIGHT) {
+                pad.left = Math.min(pad.left + PAD_MOVE_DELTA, CONTEXT_WIDTH - pad.width);
             }
 
-            sprite.moveDevice = false;
-        } else if (sprite.moveDevice == DEVICE_MOUSE) {
+            pad.moveDevice = false;
+        } else if (pad.moveDevice == DEVICE_MOUSE) {
 
-            sprite.left = Math.max(sprite.moveOption - ar.contextXLeft - (sprite.width / 2), 0);
-            sprite.left = Math.min(ar.contextWidth - sprite.width, sprite.left);
+            pad.left = Math.max(pad.moveOption - ar.contextXLeft - (pad.width / 2), 0);
+            pad.left = Math.min(CONTEXT_WIDTH - pad.width, pad.left);
 
-            sprite.moveDevice = false;
+            pad.moveDevice = false;
         }
 
     }
@@ -170,13 +149,13 @@ var bonusBehavior = {
 
     execute: function (bonus, time, fps) {
         // Бонус не пойман
-        if (bonus.top > ar.contextHeight){
+        if (bonus.top > CONTEXT_HEIGHT) {
             ar.removeObject(bonus);
         }
 
         // Бонус пойман
         if (
-            (bonus.top + bonus.height >= ar.contextHeight - PAD_HEIGHT) &&
+            (bonus.top + bonus.height >= CONTEXT_HEIGHT - PAD_HEIGHT) &&
                 (bonus.left + bonus.width > ar.pad.left) &&
                 (bonus.left < ar.pad.left + ar.pad.width)
             ) {

@@ -49,7 +49,10 @@
 
 <script>
     $('#get-js').on('click', function() {
-       $('#stage-code').text(editor.getLevelCode());
+       $('#stage-code').val(editor.getLevelCode());
+    });
+    $('#load-js').on('click', function() {
+        editor.loadLevelCode($('#stage-code').val());
     });
 </script>
 </body>

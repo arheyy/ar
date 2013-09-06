@@ -1,5 +1,8 @@
-var SPRITE_SHEET_SRC = 'img/sprites.png';
+var CONTEXT_HEIGHT = 600;
+var CONTEXT_WIDTH = 800;
 
+var SPRITESHEET = new Image();
+var SPRITESHEET_SRC = 'img/sprites.png';
 var SPRITE_BACKGROUND_1 = 'img/background1.png';
 
 // Типы объектов
@@ -41,18 +44,17 @@ var BONUS_TYPE_TRIPLE_BALL = 5;
 // Кирпичи
 var BRICK_WIDTH = 50;
 var BRICK_HEIGHT = 25;
-var BRICK_DEFAULT_LIVES = 1;
-var BRICK_DEFAULT_COLOR = 'fake';
-var BRICK_COLORS = ['green', 'blue', 'yellow', 'purple'];
 
-var METALL_WALL_WIDTH = 50;
-var METALL_WALL_HEIGHT = 10;
+var METAL_WALL_WIDTH = 50;
+var METAL_WALL_HEIGHT = 7;
 
 var DEVICE_KEYBOARD = 1;
 var DEVICE_MOUSE = 2;
 
 var LEFT = 1;
 var RIGHT = 2;
+var TOP = 3;
+var BOT = 4;
 
 var SAVE_DATA_KEY = 'arSaveData';
 
@@ -64,16 +66,24 @@ var LEVELS = [];
 
 ///////////////////////////////////////////////////////////////////
 
-var SPRITE_ARRAY_BALL_BIG = [
-    { left: 0, top: 0, width: BONUS_SIZE, height: BONUS_SIZE },
-    { left: 50, top: 0, width: BONUS_SIZE, height: BONUS_SIZE },
-    { left: 100, top: 0, width: BONUS_SIZE, height: BONUS_SIZE },
-    { left: 150, top: 0, width: BONUS_SIZE, height: BONUS_SIZE },
-    { left: 200, top: 0, width: BONUS_SIZE, height: BONUS_SIZE }
+var SPRITE_METAL_WALL = [
+    { left: 0, top: 125, width: METAL_WALL_WIDTH, height: METAL_WALL_HEIGHT },
+    { left: 50, top: 125, width: METAL_WALL_HEIGHT, height: BRICK_HEIGHT }
 ];
 
-var SPRITE_METALL_WALL = [
-    { left: 0, top: 125, width: METALL_WALL_WIDTH, height: METALL_WALL_HEIGHT }
+var BRICK_LIVES = [1, 2, 3, 1, 1];
+
+var SPRITE_BRICKS = [
+    { left: 0, top: 150, width: BRICK_WIDTH, height: BRICK_HEIGHT },
+    { left: 50, top: 150, width: BRICK_WIDTH, height: BRICK_HEIGHT },
+    { left: 100, top: 150, width: BRICK_WIDTH, height: BRICK_HEIGHT },
+    { left: 150, top: 150, width: BRICK_WIDTH, height: BRICK_HEIGHT },
+    { left: 200, top: 150, width: BRICK_WIDTH, height: BRICK_HEIGHT }
+];
+
+var SPRITE_BROKEN = [
+    { left: 50, top: 175, width: BRICK_WIDTH, height: BRICK_HEIGHT },
+    { left: 0, top: 175, width: BRICK_WIDTH, height: BRICK_HEIGHT }
 ];
 
 var SPRITE_ARRAY_BALL_NORMAL = [
@@ -101,37 +111,6 @@ var SPRITE_ARRAY_BALL_NORMAL = [
     { left: 525, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
     { left: 550, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
     { left: 575, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE }
-];
-
-var SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE = [
-    { left: 0, top: 0, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 25, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 50, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 75, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 100, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 125, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 150, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 175, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 200, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 225, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 250, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 275, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 300, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 325, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 350, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 375, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 400, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 425, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 450, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 475, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 500, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 525, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 550, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 575, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE }
-];
-
-var SPRITE_ARRAY_BRICK_1 = [
-    { left: 0, top: 100, width: BRICK_WIDTH, height: BRICK_HEIGHT },
 ];
 
 var SPRITE_ARRAY_PAD = {

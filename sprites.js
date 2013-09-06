@@ -1,3 +1,113 @@
+var DynamicSprite = function (object, cells, interval, delay) {
+    this.object = object;
+    this.cells = cells;
+    this.interval = interval;
+    this.delay = delay;
+    this.cellIndex = 0;
+    this.lastAdvance = 0;
+
+    return this;
+};
+
+DynamicSprite.prototype = {
+    advance: function () {
+        if (this.cellIndex == this.cells.length - 1) {
+            this.cellIndex = 0;
+        } else {
+            this.cellIndex++;
+        }
+    },
+
+    update: function (time) {
+        if (this.lastAdvance === 0) {
+            this.lastAdvance = time;
+        }
+
+        if (this.delay && this.cellIndex === 0) {
+            if (time - this.lastAdvance > this.delay) {
+                this.advance();
+                this.lastAdvance = time;
+            }
+        }
+        else if (time - this.lastAdvance > this.interval) {
+            this.advance();
+            this.lastAdvance = time;
+        }
+    },
+
+    draw: function (context) {
+        var cell = this.cells[this.cellIndex];
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+    }
+};
+
+var StaticSprite = function (object, cell) {
+    this.object = object;
+    this.cell = cell;
+
+    return this;
+};
+
+StaticSprite.prototype = {
+    draw: function (context) {
+        context.drawImage(SPRITESHEET, this.cell.left, this.cell.top,
+            this.cell.width, this.cell.height,
+            this.object.left, this.object.top,
+            this.cell.width, this.cell.height);
+    },
+
+    update: function (time) {
+    }
+};
+
+var MetalWallSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+MetalWallSprite.prototype = {
+    draw: function (context) {
+        var cell;
+        if (this.object.hasMetalWall(LEFT)) {
+            cell = this.cells[1];
+            context.drawImage(SPRITESHEET, cell.left, cell.top,
+                cell.width, cell.height,
+                this.object.left, this.object.top,
+                cell.width, cell.height);
+        }
+        if (this.object.hasMetalWall(RIGHT)) {
+            cell = this.cells[1];
+            context.drawImage(SPRITESHEET, cell.left, cell.top,
+                cell.width, cell.height,
+                this.object.left + this.object.width - cell.width, this.object.top,
+                cell.width, cell.height);
+        }
+        if (this.object.hasMetalWall(TOP)) {
+            cell = this.cells[0];
+            context.drawImage(SPRITESHEET, cell.left, cell.top,
+                cell.width, cell.height,
+                this.object.left, this.object.top,
+                cell.width, cell.height);
+        }
+
+        if (this.object.hasMetalWall(BOT)) {
+            cell = this.cells[0];
+            context.drawImage(SPRITESHEET, cell.left, cell.top,
+                cell.width, cell.height,
+                this.object.left, this.object.top + this.object.height - cell.height,
+                cell.width, cell.height);
+        }
+     },
+
+    update: function (time) {
+    }
+};
+
 var Sprite = function (owner) {
 //    if (!owner.artist) {
 //        console.log('No artist');
@@ -9,7 +119,7 @@ var Sprite = function (owner) {
 Sprite.prototype = {
     draw: function (context) {
 
-        if (!this.visible || !this.artist) {
+        if (!this.artist) {
             return;
         }
 
@@ -21,10 +131,6 @@ Sprite.prototype = {
     },
 
     update: function (time, fps) {
-
-        if (!this.visible) {
-            return;
-        }
 
         for (var i = 0; i < this.behaviors.length; ++i) {
 

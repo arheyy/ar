@@ -27,7 +27,7 @@ var Ar = function (canvasId) {
 
     // Images
     this.background = new Image();
-    this.spritesheet = new Image();
+    ;
 
     // Meta
     this.ballData = {
@@ -39,7 +39,7 @@ var Ar = function (canvasId) {
         size: PAD_DEFAULT_SIZE
     };
 
-    this.level = 2;
+    this.level = 1;
     this.levelData = null;
 
     // Debug
@@ -83,12 +83,6 @@ Ar.prototype = {
         for (var i = 0; i < this.levelData.length; i++) {
             this.createBrickObject(this.levelData[i]);
         }
-
-        this.createBonusObject({
-            effect: BONUS_TYPE_PAD_INCREASE,
-            left  : 400,
-            top   : 100
-        });
     },
 
     createBallObject: function (options) {
@@ -131,8 +125,13 @@ Ar.prototype = {
     },
 
     updateObjects: function (now) {
+        var object;
         for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].update(now, this.fps);
+            object = this.objects[i];
+            object.update(now);
+            if (!object.alive) {
+                this.removeObject(object);
+            }
         }
     },
 
@@ -172,8 +171,8 @@ Ar.prototype = {
     initializeImages: function () {
         var self = this;
         this.background.src = SPRITE_BACKGROUND_1;
-        this.spritesheet.src = SPRITE_SHEET_SRC;
-        this.spritesheet.onload = function () {
+        SPRITESHEET.src = SPRITESHEET_SRC;
+        SPRITESHEET.onload = function () {
             self.startGame();
         };
     },
