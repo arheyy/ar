@@ -39,7 +39,7 @@ var Ar = function (canvasId) {
         size: PAD_DEFAULT_SIZE
     };
 
-    this.level = 1;
+    this.level = 2;
     this.levelData = null;
 
     // Debug
@@ -65,7 +65,7 @@ Ar.prototype = {
     },
 
     loadLevel: function () {
-        this.levelData = LEVELS[this.level];
+        this.levelData = LEVELS[this.level - 1];
     },
 
     start: function () {

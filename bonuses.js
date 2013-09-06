@@ -31,11 +31,11 @@ Ar.prototype.bonusTripleBall = function () {
         ball = this.balls[i];
 
         var newBall = this.createBallObject(ball);
-        var newBallAng = rand(2 * Math.PI);
+        var newBallAng = 120 * Math.PI / 180 + ball.ang;
         newBall.setAng(newBallAng);
 
         var anotherBall = this.createBallObject(ball);
-        var anotherBallAng = rand(2 * Math.PI);
+        var anotherBallAng = 240 * Math.PI / 180 + ball.ang;
         anotherBall.setAng(anotherBallAng);
 
     }

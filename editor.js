@@ -5,9 +5,9 @@ var PREVIEW_LEFT = 720;
 var PREVIEW_WIDTH = 80;
 var PREVIEW_HEIGHT = 60;
 
-var BRICK_TOP_OFFSET = 10;
+var BRICK_TOP_OFFSET = 5;
 var BRICK_LEFT_OFFSET = 10;
-var BRICK_BETWEEN_DISTANCE = 10;
+var BRICK_BETWEEN_DISTANCE = 5;
 
 var Editor = function (canvasId) {
     this.canvas = document.getElementById(canvasId);
@@ -53,28 +53,28 @@ Editor.prototype = {
             left      : (BRICK_COLORS.length) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            stoneWalls: ['top']
+            metalWalls: ['top']
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 1) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            stoneWalls: ['bot']
+            metalWalls: ['bot']
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 2) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            stoneWalls: ['left']
+            metalWalls: ['left']
         }));
 
         this.controls.push(new Brick({
             left      : (BRICK_COLORS.length + 3) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
             top       : BRICK_TOP_OFFSET,
             color     : null,
-            stoneWalls: ['right']
+            metalWalls: ['right']
         }));
 
         this.previewBrick = new Brick({
@@ -149,7 +149,7 @@ Editor.prototype = {
                     };
                 }
 
-                if (control.stoneWalls.length > 0) {
+                if (control.metalWalls.length > 0) {
                     var wallBorder = {
                         left  : control.left - 3,
                         top   : control.top - 3,
@@ -157,14 +157,14 @@ Editor.prototype = {
                         height: control.height + 6
                     };
 
-                    var wall = control.stoneWalls[0];
-                    var wallIndex = this.previewBrick.stoneWalls.indexOf(wall);
+                    var wall = control.metalWalls[0];
+                    var wallIndex = this.previewBrick.metalWalls.indexOf(wall);
                     if (wallIndex == -1) {
                         this.wallBorders.push(wallBorder);
-                        this.previewBrick.stoneWalls.push(wall);
+                        this.previewBrick.metalWalls.push(wall);
                     } else {
                         this.wallBorders.splice(this.wallBorders.indexOf(wallBorder), 1);
-                        this.previewBrick.stoneWalls.splice(wallIndex, 1);
+                        this.previewBrick.metalWalls.splice(wallIndex, 1);
                     }
                 }
 
@@ -181,12 +181,12 @@ Editor.prototype = {
         var brick;
         for (var i = 0; i < this.bricks.length; i++) {
             brick = this.bricks[i];
-            if (pointInObject(point, brick)) {
+            if (brick.top == top && brick.left == left) {
 
                 if (ctrl) {
                     this.previewBrick.color = brick.color;
                     this.previewBrick.lives = brick.lives;
-                    this.previewBrick.stoneWalls = brick.stoneWalls.slice(0);
+                    this.previewBrick.metalWalls = brick.metalWalls.slice(0);
 
                     this.wallBorders = [];
 
@@ -202,8 +202,8 @@ Editor.prototype = {
                             };
                         }
 
-                        if (control.stoneWalls.length > 0) {
-                            if (this.previewBrick.stoneWalls.indexOf(control.stoneWalls[0]) != -1) {
+                        if (control.metalWalls.length > 0) {
+                            if (this.previewBrick.metalWalls.indexOf(control.metalWalls[0]) != -1) {
                                 var wallBorder = {
                                     left  : control.left - 3,
                                     top   : control.top - 3,
@@ -230,7 +230,7 @@ Editor.prototype = {
                     top       : top,
                     color     : this.previewBrick.color,
                     lives     : this.previewBrick.lives,
-                    stoneWalls: this.previewBrick.stoneWalls.slice(0)
+                    metalWalls: this.previewBrick.metalWalls.slice(0)
                 });
 
                 this.bricks.push(brick);
@@ -296,11 +296,11 @@ Editor.prototype = {
                 top       : brick.top - CONTROL_PANEL_HEIGHT,
                 color     : brick.color,
                 lives     : brick.lives,
-                stoneWalls: brick.stoneWalls
+                metalWalls: brick.metalWalls
             });
         }
 
-        return JSON.stringify(res);
+        return 'LEVELS.push(' + JSON.stringify(res) + ');';
     }
 }
 ;
@@ -359,8 +359,9 @@ $(window).on('mousemove', function (event) {
 
 
 //for (var i = 0; i < editor.bricks.length; i++) {
-//    for (var j = i + 1; j < editor.bricks.length; j++)
-//        if (editor.bricks[i].left == editor.bricks[j].left && (editor.bricks[i].top == editor.bricks[j].top) {
+//    for (var j = i + 1; j < editor.bricks.length; j++) {
+//        if ((editor.bricks[i].left == editor.bricks[j].left) && (editor.bricks[i].top == editor.bricks[j].top)) {
 //            console.log('error')
 //        }
+//    }
 //}

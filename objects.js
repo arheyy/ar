@@ -4,12 +4,12 @@ var Ball = function (options) {
     this.height = BALL_NORMAL_SIZE;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
 
-    options.ang = Math.PI * 90 / 180;
+//    options.ang = Math.PI * 90 / 180;
 
     this.left = options.left;
     this.top = options.top;
     this.setAng(options.ang || rand(BALL_START_ANGEL_MIN, BALL_START_ANGEL_MAX));
-
+//
 //    this.speed = 2;
 //    this.left = 330;
 //    this.top = 251;
@@ -87,23 +87,23 @@ Ball.prototype = {
 
     correctAng: function (ang) {
 
-//        if (ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-//            ang = BALL_MIN_HORIZONTAL_ANGEL_DELTA;
-//        }
-//
-//        if (Math.PI - ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-//            ang = Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
-//        }
-//
-//
-//        if (ang - Math.PI < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-//            ang = Math.PI + BALL_MIN_HORIZONTAL_ANGEL_DELTA;
-//        }
-//
-//        if (2 * Math.PI - ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-//            ang = 2 * Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
-//        }
+        if (ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
+            return BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+        }
 
+        if ((ang < Math.PI) && (Math.PI - ang) < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
+            ang = Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+        }
+
+        if ((ang > Math.PI) && (ang - Math.PI) < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
+            ang = Math.PI + BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+        }
+
+        if (2 * Math.PI - ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
+            ang = 2 * Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+        }
+
+        return ang;
     },
 
     simplify: function (ang) {
@@ -116,6 +116,7 @@ Ball.prototype = {
 
     setAng: function (ang) {
         this.ang = this.simplify(ang);
+        this.ang = this.correctAng(ang);
         this.calcDxDy();
     },
 
@@ -213,7 +214,7 @@ var Brick = function (options) {
     ///// Not implemented
     this.color = options.color;
     this.lives = options.lives || BRICK_DEFAULT_LIVES;
-    this.stoneWalls = options.stoneWalls || [];
+    this.metalWalls = options.metalWalls || [];
 
     this.visible = true;
 
@@ -296,7 +297,7 @@ Brick.prototype = {
         context.rect(this.left, this.top, this.width, this.height);
         context.stroke();
 
-        if (this.stoneWalls.indexOf('top') != -1) {
+        if (this.metalWalls.indexOf('top') != -1) {
             context.beginPath();
             context.strokeStyle = 'black';
             context.lineWidth = 2;
@@ -305,7 +306,7 @@ Brick.prototype = {
             context.stroke();
         }
 
-        if (this.stoneWalls.indexOf('bot') != -1) {
+        if (this.metalWalls.indexOf('bot') != -1) {
             context.beginPath();
             context.strokeStyle = 'black';
             context.lineWidth = 2;
@@ -314,7 +315,7 @@ Brick.prototype = {
             context.stroke();
         }
 
-        if (this.stoneWalls.indexOf('left') != -1) {
+        if (this.metalWalls.indexOf('left') != -1) {
             context.beginPath();
             context.strokeStyle = 'black';
             context.lineWidth = 2;
@@ -323,7 +324,7 @@ Brick.prototype = {
             context.stroke();
         }
 
-        if (this.stoneWalls.indexOf('right') != -1) {
+        if (this.metalWalls.indexOf('right') != -1) {
             context.beginPath();
             context.strokeStyle = 'black';
             context.lineWidth = 2;
