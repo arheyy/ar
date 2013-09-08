@@ -25,13 +25,6 @@ var Editor = function (canvasId) {
 
     this.bricks = [];
     this.previewBrick = null;
-
-    this.selectedColor = null;
-    this.selectedLives = null;
-
-    this.colorBorder = null;
-    this.wallBorders = [];
-
 };
 
 Editor.prototype = {
@@ -40,46 +33,44 @@ Editor.prototype = {
         var i;
         for (i = 0; i < SPRITE_BRICKS.length; i++) {
             this.controls.push(new Brick({
-                left : i * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-                top  : BRICK_TOP_OFFSET + j * (BRICK_HEIGHT + BRICK_TOP_OFFSET),
-                lives: j + 1,
-                color: BRICK_COLORS[i]
+                left: i * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+                top: BRICK_TOP_OFFSET,
+                brickType: i
             }));
         }
 
         this.controls.push(new Brick({
-            left      : (BRICK_COLORS.length) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top       : BRICK_TOP_OFFSET,
-            color     : null,
+            left: BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            brickType: 0,
             metalWalls: [TOP]
         }));
 
         this.controls.push(new Brick({
-            left      : (BRICK_COLORS.length + 1) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top       : BRICK_TOP_OFFSET,
-            color     : null,
+            left: (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            brickType: 0,
             metalWalls: [BOT]
         }));
 
         this.controls.push(new Brick({
-            left      : (BRICK_COLORS.length + 2) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top       : BRICK_TOP_OFFSET,
-            color     : null,
+            left: 2 * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            brickType: 0,
             metalWalls: [LEFT]
         }));
 
         this.controls.push(new Brick({
-            left      : (BRICK_COLORS.length + 3) * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top       : BRICK_TOP_OFFSET,
-            color     : null,
+            left: 3 * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            brickType: 0,
             metalWalls: [RIGHT]
         }));
 
         this.previewBrick = new Brick({
-            left : PREVIEW_LEFT + (PREVIEW_WIDTH - BRICK_WIDTH) / 2,
-            top  : PREVIEW_TOP + (PREVIEW_HEIGHT - BRICK_HEIGHT) / 2,
-            color: this.selectedColor,
-            lives: this.selectedLives
+            left: PREVIEW_LEFT + (PREVIEW_WIDTH - BRICK_WIDTH) / 2,
+            top: PREVIEW_TOP + (PREVIEW_HEIGHT - BRICK_HEIGHT) / 2,
+            brickType: 0
         });
 
     },
@@ -131,61 +122,21 @@ Editor.prototype = {
         for (var i = 0; i < this.controls.length; i++) {
             var control = this.controls[i];
 
-            if (pointInObject(point, control)) {
-                if (!this.previewBrick.color && !control.color) {
-                    this.selectedColor = control.color;
-                }
+            if (control.metalWalls.length > 0) {
+                control.brickType = this.previewBrick.brickType;
 
-                if (control.color) {
-                    this.previewBrick.color = control.color;
-                    this.previewBrick.lives = control.lives;
-                    this.colorBorder = {
-                        left  : control.left - 3,
-                        top   : control.top - 3,
-                        width : control.width + 6,
-                        height: control.height + 6
-                    };
-                }
-
-                if (control.metalWalls.length > 0) {
-
-                    var wallBorder = {
-                        left  : control.left - 3,
-                        top   : control.top - 3,
-                        width : control.width + 6,
-                        height: control.height + 6
-                    };
-
+                if (pointInObject(point, control)) {
                     var side = control.metalWalls[0];
                     if (this.previewBrick.hasMetalWall(side)) {
                         this.previewBrick.metalWalls.splice(this.previewBrick.metalWalls.indexOf(side), 1);
-
-                        for (var j = 0; j < this.wallBorders.length; j++) {
-                            if (this.wallBorders[j].left == wallBorder.left && this.wallBorders[j].top == wallBorder.top) {
-                                this.wallBorders.splice(j, 1);
-                                break;
-                            }
-                        }
-
                     } else {
                         this.previewBrick.metalWalls.push(side);
-                        this.wallBorders.push(wallBorder);
-
                     }
-
-//
-//                    var wall = control.metalWalls[0];
-//                    var wallIndex = this.previewBrick.metalWalls.indexOf(wall);
-//                    if (!this.previewBrick.hasMetalWall(wall)) {
-//                        this.wallBorders.push(wallBorder);
-//                        this.previewBrick.metalWalls.push(wall);
-//                    } else {
-//                        this.wallBorders.splice(this.wallBorders.indexOf(wallBorder), 1);
-//                        this.previewBrick.metalWalls.splice(wallIndex, 1);
-//                    }
                 }
-
-                return;
+            } else {
+                if (pointInObject(point, control)) {
+                    this.previewBrick.brickType = control.brickType;
+                }
             }
         }
     },
@@ -201,37 +152,10 @@ Editor.prototype = {
             if (brick.top == top && brick.left == left) {
 
                 if (ctrl) {
-                    this.previewBrick.color = brick.color;
-                    this.previewBrick.lives = brick.lives;
+                    this.previewBrick.brickType = brick.brickType;
                     this.previewBrick.metalWalls = brick.metalWalls.slice(0);
 
-                    this.wallBorders = [];
-
-                    for (var j = 0; j < this.controls.length; j++) {
-                        var control = this.controls[j];
-
-                        if (control.color == this.previewBrick.color && control.lives == this.previewBrick.lives) {
-                            this.colorBorder = {
-                                left  : control.left - 3,
-                                top   : control.top - 3,
-                                width : control.width + 6,
-                                height: control.height + 6
-                            };
-                        }
-
-                        if (control.metalWalls.length > 0) {
-                            if (this.previewBrick.hasMetalWall(control.metalWalls[0])) {
-                                var wallBorder = {
-                                    left  : control.left - 3,
-                                    top   : control.top - 3,
-                                    width : control.width + 6,
-                                    height: control.height + 6
-                                };
-
-                                this.wallBorders.push(wallBorder);
-                            }
-                        }
-                    }
+                    return;
                 } else {
                     this.bricks.splice(i, 1);
                 }
@@ -240,39 +164,39 @@ Editor.prototype = {
         }
 
         if (button == 0) {
-            if (this.previewBrick.color) {
 
-                brick = new Brick({
-                    left      : left,
-                    top       : top,
-                    color     : this.previewBrick.color,
-                    lives     : this.previewBrick.lives,
-                    metalWalls: this.previewBrick.metalWalls.slice(0)
-                });
+            brick = new Brick({
+                left: left,
+                top: top,
+                brickType: this.previewBrick.brickType,
+                metalWalls: this.previewBrick.metalWalls.slice(0)
+            });
 
-                this.bricks.push(brick);
+            this.bricks.push(brick);
+        }
+    },
+
+    drawBrickTypeBorder: function () {
+        for (var i = 0; i < this.controls.length; i++) {
+            var control = this.controls[i];
+            if (control.brickType == this.previewBrick.brickType && control.metalWalls.length == 0) {
+                this.context.beginPath();
+                this.context.strokeStyle = 'red';
+                this.context.lineWidth = 2;
+                this.context.rect(control.left - 3, control.top - 3, control.width + 6, control.height + 6);
+                this.context.stroke();
             }
         }
     },
 
-    drawColorBorder: function () {
-        if (this.colorBorder) {
-            this.context.beginPath();
-            this.context.strokeStyle = 'red';
-            this.context.lineWidth = 2;
-            this.context.rect(this.colorBorder.left, this.colorBorder.top, this.colorBorder.width, this.colorBorder.height);
-            this.context.stroke();
-        }
-    },
-
     drawWallBorder: function () {
-        if (this.wallBorders.length) {
-            for (var i = 0; i < this.wallBorders.length; i++) {
-                var border = this.wallBorders[i];
+        for (var i = 0; i < this.controls.length; i++) {
+            var control = this.controls[i];
+            if (control.metalWalls.length >= 0 && this.previewBrick.hasMetalWall(control.metalWalls[0])) {
                 this.context.beginPath();
                 this.context.strokeStyle = 'red';
                 this.context.lineWidth = 2;
-                this.context.rect(border.left, border.top, border.width, border.height);
+                this.context.rect(control.left - 3, control.top - 3, control.width + 6, control.height + 6);
                 this.context.stroke();
             }
         }
@@ -282,13 +206,12 @@ Editor.prototype = {
         for (var i = 0; i < this.bricks.length; i++) {
             this.bricks[i].draw(this.context);
         }
-
     },
 
     draw: function () {
         this.drawScene();
         this.drawControls();
-        this.drawColorBorder();
+        this.drawBrickTypeBorder();
         this.drawWallBorder();
         this.drawBrickPreview();
         this.drawBricks();
@@ -316,10 +239,9 @@ Editor.prototype = {
         for (var i = 0; i < this.bricks.length; i++) {
             var brick = this.bricks[i];
             res.push({
-                left      : brick.left,
-                top       : brick.top - CONTROL_PANEL_HEIGHT,
-                color     : brick.color,
-                lives     : brick.lives,
+                left: brick.left,
+                top: brick.top - CONTROL_PANEL_HEIGHT,
+                brickType: brick.brickType,
                 metalWalls: brick.metalWalls
             });
         }
@@ -334,10 +256,9 @@ Editor.prototype = {
         for (var i = 0; i < LEVELS[0].length; i++) {
             var brick = LEVELS[0][i];
             this.bricks.push(new Brick({
-                left      : brick.left,
-                top       : brick.top + CONTROL_PANEL_HEIGHT,
-                color     : brick.color,
-                lives     : brick.lives,
+                left: brick.left,
+                top: brick.top + CONTROL_PANEL_HEIGHT,
+                brickType: brick.brickType,
                 metalWalls: brick.metalWalls
             }));
         }

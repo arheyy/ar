@@ -63,6 +63,70 @@ StaticSprite.prototype = {
     }
 };
 
+var BrickSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+BrickSprite.prototype = {
+    draw: function (context) {
+        var cell = this.cells[this.object.brickType];
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+    },
+
+    update: function (time) {
+    }
+};
+
+var BrokenSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+BrokenSprite.prototype = {
+    draw: function (context) {
+
+        if (this.object.lives == 1) {
+            return;
+        }
+
+        if (this.object.lives == this.object.health) {
+            return;
+        }
+
+        var cell;
+
+        if (this.object.lives == 2) {
+            cell = this.cells[1];
+        }
+
+        if (this.object.lives === 3) {
+            if (this.object.health == 2) {
+                cell = this.cells[0];
+            } else {
+                cell = this.cells[1];
+            }
+        }
+if (!cell) {
+    c(this.object);
+}
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+    },
+
+    update: function (time) {
+    }
+};
+
 var MetalWallSprite = function (object, cells) {
     this.object = object;
     this.cells = cells;
@@ -109,10 +173,6 @@ MetalWallSprite.prototype = {
 };
 
 var Sprite = function (owner) {
-//    if (!owner.artist) {
-//        console.log('No artist');
-//    }
-
     return this;
 };
 

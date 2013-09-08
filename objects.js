@@ -3,6 +3,7 @@ var Ball = function (options) {
     this.width = BALL_NORMAL_SIZE;
     this.height = BALL_NORMAL_SIZE;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
+    this.size = options.size == undefined ? BALL_NORMAL_SIZE : options.size;
 
 //    options.ang = Math.PI * 90 / 180;
 
@@ -22,7 +23,7 @@ var Ball = function (options) {
 
     this.behaviors = [moveBallBehavior];
 
-    this.sprites = [new DynamicSprite(this, SPRITE_ARRAY_BALL_NORMAL, 150, 0)];
+    this.sprites = [new DynamicSprite(this, SPRITE_BALL, 150, 0)];
 };
 
 Ball.prototype = {
@@ -177,7 +178,6 @@ var Bonus = function (options) {
     this.artist = new SpriteSheetArtist(SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
     this.behaviors = [
         bonusBehavior,
-        new CycleBehavior(100, 0)
     ];
 
     this.sprite = new Sprite(this);
@@ -201,20 +201,21 @@ Bonus.prototype = {
 
 var Brick = function (options) {
     this.type = OBJECT_TYPE_BRICK;
+    this.brickType = options.brickType;
+    this.lives = BRICK_LIVES[this.brickType];
+    this.health = this.lives;
     this.width = BRICK_WIDTH;
     this.height = BRICK_HEIGHT;
     this.left = options.left;
     this.top = options.top;
-    this.color = options.color;
-    this.lives = options.lives || BRICK_DEFAULT_LIVES;
     this.metalWalls = options.metalWalls || [];
     this.alive = true;
 
     this.behaviors = [];
 
     this.sprites = [
-        new StaticSprite(this, SPRITE_BRICK_5),
-        new StaticSprite(this, SPRITE_BROKEN_1),
+        new BrickSprite(this, SPRITE_BRICKS),
+        new BrokenSprite(this, SPRITE_BROKEN),
         new MetalWallSprite(this, SPRITE_METAL_WALL)
     ];
 };
@@ -222,69 +223,6 @@ var Brick = function (options) {
 Brick.prototype = {
 
     draw: function (context) {
-//        var style;
-//        switch (this.color) {
-//            case 'green':
-//                switch (this.lives) {
-//                    case 1:
-//                        style = '#00FF66';
-//                        break;
-//                    case 2:
-//                        style = '#339933';
-//                        break;
-//                    default:
-//                        style = '#006600';
-//                        break;
-//                }
-//                break;
-//            case 'blue':
-//                switch (this.lives) {
-//                    case 1:
-//                        style = '#6699FF';
-//                        break;
-//                    case 2:
-//                        style = '#0033FF';
-//                        break;
-//                    default:
-//                        style = '#003399';
-//                        break;
-//                }
-//                break;
-//            case 'yellow':
-//                switch (this.lives) {
-//                    case 1:
-//                        style = '#FFCC33';
-//                        break;
-//                    case 2:
-//                        style = '#CCCC00';
-//                        break;
-//                    default:
-//                        style = '#CC9900';
-//                        break;
-//                }
-//                break;
-//            case 'purple':
-//                switch (this.lives) {
-//                    case 1:
-//                        style = '#FF33FF';
-//                        break;
-//                    case 2:
-//                        style = '#996699';
-//                        break;
-//                    default:
-//                        style = '#660066';
-//                        break;
-//                }
-//                break;
-//            case null:
-//                style = '#DDDDDD';
-//                break;
-//        }
-//
-//        context.beginPath();
-//        context.fillStyle = style;
-//        context.fillRect(this.left, this.top, this.width, this.height);
-
         for (var i = 0; i < this.sprites.length; i++) {
             this.sprites[i].draw(context);
         }
@@ -297,7 +235,7 @@ Brick.prototype = {
             return false;
         }
 
-        this.lives--;
+        this.health--;
 
         return true;
     },
@@ -306,7 +244,7 @@ Brick.prototype = {
         for (var i = 0; i < this.sprites.length; i++) {
             this.sprites[i].update(time);
         }
-        if (this.lives <= 0) {
+        if (this.health <= 0) {
             this.alive = false;
         }
     },

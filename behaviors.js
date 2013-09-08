@@ -49,6 +49,10 @@ var moveBallBehavior = {
         for (var i = 0; i < ar.bricks.length; i++) {
             var brick = ar.bricks[i];
 
+            if (brick.health <= 0) {
+                return;
+            }
+
             var horizontalSide = ball.dy > 0 ? TOP : BOT;
             var verticalSide = ball.dx > 0 ? LEFT : RIGHT;
 
@@ -63,13 +67,14 @@ var moveBallBehavior = {
                 var kx = Math.abs(horizontalIntersect[0].x - verticalIntersect[0].x);
                 var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
 
-                if (equalPresision(kx, ky)) {
-
-                    ball.invertXDirection();
-                    ball.invertYDirection();
-                    touchSide = [horizontalSide, verticalSide];
-
-                } else if (kx > ky) {
+//                if (equalPresision(kx, ky)) {
+//
+//                    ball.invertXDirection();
+//                    ball.invertYDirection();
+//                    touchSide = [horizontalSide, verticalSide];
+//
+//                } else
+                if (kx > ky) {
 
                     ball.invertYDirection();
                     touchSide = horizontalSide;

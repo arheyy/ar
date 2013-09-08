@@ -12,8 +12,9 @@ var OBJECT_TYPE_BONUS = 'bonus';
 var OBJECT_TYPE_BRICK = 'brick';
 
 // Шарик
+var BALL_SMALL_SIZE = 15;
 var BALL_NORMAL_SIZE = 25;
-var BALL_BIG_SIZE = 50;
+var BALL_BIG_SIZE = 35;
 var BALL_DEFAULT_SPEED = 5;
 var BALL_MIN_SPEED = 2;
 var BALL_MAX_SPEED = 20; // Если увеличить то надо менять алгоритм расчета столкновений с блоками
@@ -86,41 +87,20 @@ var SPRITE_BROKEN = [
     { left: 0, top: 175, width: BRICK_WIDTH, height: BRICK_HEIGHT }
 ];
 
-var SPRITE_ARRAY_BALL_NORMAL = [
-    { left: 0, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 25, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 50, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 75, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 100, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 125, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 150, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 175, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 200, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 225, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 250, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 275, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 300, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 325, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 350, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 375, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 400, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 425, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 450, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 475, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 500, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 525, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 550, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 575, top: 50, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE }
+var SPRITE_BALL = [
+    { left: 60, top: 0, width: BALL_SMALL_SIZE, height: BALL_SMALL_SIZE },
+    { left: 35, top: 0, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
+    { left: 0, top: 0, width: BALL_BIG_SIZE, height: BALL_BIG_SIZE }
 ];
 
 var SPRITE_ARRAY_PAD = {
-    leftCorner : {
+    leftCorner: {
         left: 0, top: 80, width: PAD_CORNER_WIDTH, height: PAD_HEIGHT
     },
     rightCorner: {
         left: 20, top: 80, width: PAD_CORNER_WIDTH, height: PAD_HEIGHT
     },
-    middle     : {
+    middle: {
         left: 10, top: 80, width: PAD_MIDDLE_WIDTH, height: PAD_HEIGHT
     }
 };
