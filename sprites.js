@@ -114,9 +114,9 @@ BrokenSprite.prototype = {
                 cell = this.cells[1];
             }
         }
-if (!cell) {
-    c(this.object);
-}
+        if (!cell) {
+            c(this.object);
+        }
         context.drawImage(SPRITESHEET, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
@@ -166,7 +166,7 @@ MetalWallSprite.prototype = {
                 this.object.left, this.object.top + this.object.height - cell.height,
                 cell.width, cell.height);
         }
-     },
+    },
 
     update: function (time) {
     }
@@ -174,6 +174,26 @@ MetalWallSprite.prototype = {
 
 var Sprite = function (owner) {
     return this;
+};
+
+var BallSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+BallSprite.prototype = {
+    draw: function (context) {
+        var cell = this.cells[this.object.size];
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+    },
+
+    update: function (time) {
+    }
 };
 
 Sprite.prototype = {

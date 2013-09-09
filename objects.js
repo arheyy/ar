@@ -1,10 +1,9 @@
 var Ball = function (options) {
     this.type = OBJECT_TYPE_BALL;
-    this.width = BALL_NORMAL_SIZE;
-    this.height = BALL_NORMAL_SIZE;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
-    this.size = options.size == undefined ? BALL_NORMAL_SIZE : options.size;
-
+    this.size = options.size || BALL_NORMAL_SIZE;
+    this.width = this.size;
+    this.height = this.size;
 //    options.ang = Math.PI * 90 / 180;
 
     this.left = options.left;
@@ -23,7 +22,7 @@ var Ball = function (options) {
 
     this.behaviors = [moveBallBehavior];
 
-    this.sprites = [new DynamicSprite(this, SPRITE_BALL, 150, 0)];
+    this.sprites = [new BallSprite(this, SPRITE_BALL)];
 };
 
 Ball.prototype = {
@@ -82,6 +81,12 @@ Ball.prototype = {
     setSpeed: function (speed) {
         this.speed = speed;
         this.calcDxDy();
+    },
+
+    setSize: function (size) {
+        this.size = size;
+        this.width = this.size;
+        this.height = this.size;
     },
 
     correctAng: function (ang) {

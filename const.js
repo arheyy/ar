@@ -69,7 +69,7 @@ var LEVELS = [];
 
 var SPRITE_METAL_WALL = [
     { left: 0, top: 125, width: METAL_WALL_WIDTH, height: METAL_WALL_HEIGHT },
-    { left: 50, top: 125, width: METAL_WALL_HEIGHT, height: BRICK_HEIGHT }
+    { left: 50, top: 125, width: METAL_WALL_HEIGHT, height: METAL_WALL_WIDTH }
 ];
 
 var BRICK_LIVES = [1, 2, 3, 1, 1];
@@ -87,11 +87,10 @@ var SPRITE_BROKEN = [
     { left: 0, top: 175, width: BRICK_WIDTH, height: BRICK_HEIGHT }
 ];
 
-var SPRITE_BALL = [
-    { left: 60, top: 0, width: BALL_SMALL_SIZE, height: BALL_SMALL_SIZE },
-    { left: 35, top: 0, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE },
-    { left: 0, top: 0, width: BALL_BIG_SIZE, height: BALL_BIG_SIZE }
-];
+var SPRITE_BALL = [];
+SPRITE_BALL[BALL_SMALL_SIZE] = { left: 60, top: 0, width: BALL_SMALL_SIZE, height: BALL_SMALL_SIZE };
+SPRITE_BALL[BALL_NORMAL_SIZE] = { left: 35, top: 0, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE };
+SPRITE_BALL[BALL_BIG_SIZE] = { left: 0, top: 0, width: BALL_BIG_SIZE, height: BALL_BIG_SIZE };
 
 var SPRITE_ARRAY_PAD = {
     leftCorner: {

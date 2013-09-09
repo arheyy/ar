@@ -40,3 +40,22 @@ Ar.prototype.bonusTripleBall = function () {
 
     }
 };
+
+Ar.prototype.bonusSmallBall = function () {
+    for (var i = 0; i < this.balls.length; i++) {
+        this.balls[i].setSize(BALL_SMALL_SIZE);
+    }
+};
+
+Ar.prototype.bonusBigBall = function () {
+    for (var i = 0; i < this.balls.length; i++) {
+        this.balls[i].setSize(BALL_BIG_SIZE);
+    }
+};
+
+Ar.prototype.bonusResetBall = function () {
+    for (var i = 0; i < this.balls.length; i++) {
+        this.balls[i].setSize(BALL_NORMAL_SIZE);
+    }
+};
+
