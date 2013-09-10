@@ -1,6 +1,10 @@
 Point = function (left, top) {
     return {left: left, top: top};
-}
+};
+
+Rect = function (left, top, width, height) {
+    return {left: left, top: top, width: width, height: height};
+};
 
 function c(obj) {
     if (typeof obj === 'object') {

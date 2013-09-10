@@ -6,8 +6,8 @@ var Ball = function (options) {
     this.height = this.size;
 //    options.ang = Math.PI * 90 / 180;
 
-    this.left = options.left;
-    this.top = options.top;
+    this.left = options.left || (PG_WIDTH - BALL_NORMAL_SIZE) / 2;
+    this.top = options.top || CONTEXT_HEIGHT - PAD_HEIGHT - BALL_NORMAL_SIZE;
     this.setAng(options.ang || rand(BALL_START_ANGEL_MIN, BALL_START_ANGEL_MAX));
     this.alive = true;
 //
@@ -62,7 +62,7 @@ Ball.prototype = {
     },
 
     isSideWallCollision: function () {
-        return (this.left + this.dx < 0 && this.dx < 0) || (this.left + this.dx + this.width > CONTEXT_WIDTH && this.dx > 0);
+        return (this.left + this.dx < 0 && this.dx < 0) || (this.left + this.dx + this.width > PG_WIDTH && this.dx > 0);
     },
 
     isTopWallCollision: function () {
@@ -78,7 +78,17 @@ Ball.prototype = {
         this.top += this.dy;
     },
 
+    incSpeed: function() {
+        this.setSpeed(this.speed + BALL_SPEED_DELTA);
+    },
+
+    decSpeed: function() {
+        this.setSpeed(this.speed - BALL_SPEED_DELTA);
+    },
+
     setSpeed: function (speed) {
+        speed = Math.min(speed, BALL_MAX_SPEED);
+        speed = Math.max(speed, BALL_MIN_SPEED);
         this.speed = speed;
         this.calcDxDy();
     },
@@ -96,15 +106,15 @@ Ball.prototype = {
         }
 
         if ((ang < Math.PI) && (Math.PI - ang) < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-            ang = Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+            return Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
         }
 
         if ((ang > Math.PI) && (ang - Math.PI) < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-            ang = Math.PI + BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+            return Math.PI + BALL_MIN_HORIZONTAL_ANGEL_DELTA;
         }
 
         if (2 * Math.PI - ang < BALL_MIN_HORIZONTAL_ANGEL_DELTA) {
-            ang = 2 * Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
+            return 2 * Math.PI - BALL_MIN_HORIZONTAL_ANGEL_DELTA;
         }
 
         return ang;
@@ -119,7 +129,7 @@ Ball.prototype = {
     },
 
     setAng: function (ang) {
-        this.ang = this.simplify(ang);
+        ang = this.simplify(ang);
         this.ang = this.correctAng(ang);
         this.calcDxDy();
     },
@@ -134,9 +144,10 @@ Ball.prototype = {
 };
 
 var Pad = function (options) {
+    options = options || {};
     this.type = OBJECT_TYPE_PAD;
-    this.setSize(options.size);
-    this.left = options.left || (CONTEXT_WIDTH - this.width) / 2;
+    this.setSize(options.size || PAD_DEFAULT_SIZE);
+    this.left = options.left || (PG_WIDTH - this.width) / 2;
     this.height = PAD_HEIGHT;
     this.top = options.top || (CONTEXT_HEIGHT - PAD_HEIGHT);
     this.move = options.move || false;
@@ -156,8 +167,8 @@ Pad.prototype = {
         this.size = size;
         this.width = PAD_CORNER_WIDTH * 2 + PAD_MIDDLE_WIDTH * this.size;
 
-        if (this.left + this.width > CONTEXT_WIDTH) {
-            this.left = CONTEXT_WIDTH - this.width;
+        if (this.left + this.width > PG_WIDTH) {
+            this.left = PG_WIDTH - this.width;
         }
     },
 
@@ -170,39 +181,39 @@ Pad.prototype = {
     }
 };
 
-var Bonus = function (options) {
-    this.type = OBJECT_TYPE_BONUS;
-    this.effect = options.effect;
-    this.width = BONUS_SIZE;
-    this.height = BONUS_SIZE;
-    this.left = options.left;
-    this.top = options.top;
-    this.dy = BONUS_SPEED;
-    this.alive = true;
-
-    this.artist = new SpriteSheetArtist(SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
-    this.behaviors = [
-        bonusBehavior,
-    ];
-
-    this.sprite = new Sprite(this);
-
-};
-
-Bonus.prototype = {
-
-    draw: function (context) {
-        this.sprite.draw.call(this, context);
-    },
-
-    update: function (time, fps) {
-        this.sprite.update.call(this, time, fps);
-    },
-
-    move: function () {
-        this.top += this.dy;
-    }
-};
+//var Bonus = function (options) {
+//    this.type = OBJECT_TYPE_BONUS;
+//    this.effect = options.effect;
+//    this.width = BONUS_SIZE;
+//    this.height = BONUS_SIZE;
+//    this.left = options.left;
+//    this.top = options.top;
+//    this.dy = BONUS_SPEED;
+//    this.alive = true;
+//
+//    this.artist = new SpriteSheetArtist(SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
+//    this.behaviors = [
+//        bonusBehavior,
+//    ];
+//
+//    this.sprite = new Sprite(this);
+//
+//};
+//
+//Bonus.prototype = {
+//
+//    draw: function (context) {
+//        this.sprite.draw.call(this, context);
+//    },
+//
+//    update: function (time, fps) {
+//        this.sprite.update.call(this, time, fps);
+//    },
+//
+//    move: function () {
+//        this.top += this.dy;
+//    }
+//};
 
 var Brick = function (options) {
     this.type = OBJECT_TYPE_BRICK;
@@ -249,6 +260,7 @@ Brick.prototype = {
         for (var i = 0; i < this.sprites.length; i++) {
             this.sprites[i].update(time);
         }
+
         if (this.health <= 0) {
             this.alive = false;
         }
@@ -258,7 +270,7 @@ Brick.prototype = {
         return this.metalWalls.indexOf(side) != -1;
     },
 
-    getSideLine  : function (side) {
+    getSideLine: function (side) {
         switch (side) {
             case TOP:
                 return {
@@ -291,4 +303,34 @@ Brick.prototype = {
         }
     }
 
+};
+
+var Button = function (buttonType) {
+    this.type = OBJECT_TYPE_BUTTON;
+    this.buttonType = buttonType;
+    this.width = BUTTON_WIDTH;
+    this.height = BUTTON_HEIGHT;
+    this.left = BUTTONS_LEFT;
+    this.top = BUTTONS_TOP[this.buttonType];
+    this.label = BUTTONS_LABEL[this.buttonType];
+    this.state = false;
+
+    this.sprites = [
+        new ButtonSprite(this, SPRITE_BUTTONS),
+    ];
+};
+
+Button.prototype = {
+
+    draw: function (context) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].draw(context);
+        }
+    },
+
+    update: function (time) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].update(time);
+        }
+    }
 };

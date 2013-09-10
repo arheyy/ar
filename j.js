@@ -1,12 +1,42 @@
-var Ar = function (canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.context = this.canvas.getContext('2d');
+var Ar = function (contId) {
+    var bgCanvas = $('<canvas/>')
+        .attr('width', PG_WIDTH)
+        .attr('height', CONTEXT_HEIGHT)
+        .css({position: 'absolute'})
+        ;
 
-    this.contextWidth = this.context.canvas.width;
-    this.contextHeight = this.context.canvas.height;
+    $(contId).append(bgCanvas);
 
-    this.contextXLeft = $(this.canvas).offset().left;
-    this.contextXRight = this.contextXLeft + this.contextWidth;
+    this.bgContext = bgCanvas[0].getContext('2d');
+
+    var bricksCanvas = $('<canvas/>')
+            .attr('width', PG_WIDTH)
+            .attr('height', CONTEXT_HEIGHT)
+            .css({position: 'absolute'})
+        ;
+
+    $(contId).append(bricksCanvas);
+
+    this.bricksContext = bricksCanvas[0].getContext('2d');
+
+    var mainCanvas = $('<canvas/>')
+        .attr('width', CONTEXT_WIDTH)
+        .attr('height', CONTEXT_HEIGHT)
+        .css({position: 'absolute'})
+    ;
+
+    $(contId).append(mainCanvas);
+
+    //////////////////
+
+
+    /////////////////
+
+
+    this.mainContext = mainCanvas[0].getContext('2d');
+
+    this.mainCanvasLeft = mainCanvas.offset().left;
+    this.mainCanvasTop = mainCanvas.offset().top;
 
     this.fpsElement = document.getElementById('fps');
 
@@ -14,79 +44,136 @@ var Ar = function (canvasId) {
     this.lastFpsUpdateTime = 0;
     this.fps = 60;
     this.frameCounter = 0;
-    ;
 
-    this.paused = false;
+    this.screenMessage = null;
+    this.hintMessage = null;
+    this.gameStarted = false;
+    this.gamePaused = false;
 
     // Спрайты
+    this.buttons = [];
     this.objects = [];
     this.pad = null;
     this.balls = [];
     this.bonuses = [];
     this.bricks = [];
 
+    this.bricksUpdated = true;
+
+//    this.leftBrick = null;
+//    this.rightBrick = null;
+//    this.topBrick = null;
+//    this.botBrick = null;
+
     // Images
     this.background = new Image();
-    ;
-
-    // Meta
-    this.ballData = {
-        left: (this.contextWidth - BALL_NORMAL_SIZE) / 2,
-        top : this.contextHeight - BALL_TOP
-    };
-
-    this.padData = {
-        size: PAD_DEFAULT_SIZE
-    };
 
     this.level = 1;
     this.levelData = null;
-
-    // Debug
-    this.processOneFrame = false;
 
 };
 
 Ar.prototype = {
 
-    calculateFps: function (now) {
-        var fps = 1000 / (now - this.lastAnimationFrameTime);
-        this.lastAnimationFrameTime = now;
+    startScreen: function () {
+        this.screenMessage = MESSAGE_GREETING;
+        this.hintMessage = MESSAGE_PRESS_START;
+        this.resetObjects();
 
-        if (now - this.lastFpsUpdateTime > 1000) {
-            this.lastFpsUpdateTime = now;
-            this.fpsElement.innerHTML = this.fps.toFixed(0) + ' fps';
+        this.background.src = SPRITE_BACKGROUND_1;
+        var self = this;
+        SPRITESHEET.src = SPRITESHEET_SRC;
+        SPRITESHEET.onload = function() {
+            self.drawBackground();
+            self.createButtons();
+            requestAnimationFrame(self.animate);
+            self.startNewGame();
+        }
+    },
+
+    resetObjects: function () {
+        this.objects = [];
+        this.pad = null;
+        this.balls = [];
+        this.bonuses = [];
+        this.bricks = [];
+    },
+
+    drawBackground: function () {
+        this.bgContext.drawImage(this.background, 0, 0, 800, 600, 0, 0, 800, 600);
+
+        if (this.screenMessage) {
+            this.bgContext.font = "italic 50pt Arial";
+            this.bgContext.textBaseline = "middle";
+            this.bgContext.textAlign = "center";
+            this.bgContext.fillStyle = '#00FF66';
+            this.bgContext.fillText(this.screenMessage, PG_WIDTH / 2, CONTEXT_HEIGHT / 2);
         }
 
-        this.frameCounter++;
-        $('#frame-counter').html(this.frameCounter);
+        if (this.hintMessage) {
+            this.bgContext.font = "italic 20pt Arial";
+            this.bgContext.textBaseline = "middle";
+            this.bgContext.textAlign = "center";
+            this.bgContext.fillStyle = '#00FF66';
+            this.bgContext.fillText(this.hintMessage, PG_WIDTH / 2, CONTEXT_HEIGHT / 2 + 150);
+        }
+    },
 
-        return fps;
+    createButtons: function () {
+        var obj;
+        obj = new Button(BUTTON_TYPE_START);
+        this.buttons.push(obj);
+
+        obj = new Button(BUTTON_TYPE_PAUSE);
+        this.buttons.push(obj);
+
+        obj = new Button(BUTTON_TYPE_SAVE);
+        this.buttons.push(obj);
+
+        obj = new Button(BUTTON_TYPE_LOAD);
+        this.buttons.push(obj);
+
+        this.drawButtons();
+    },
+
+    drawButtons: function () {
+        for (var i = 0; i < this.buttons.length; i++) {
+            this.buttons[i].draw(this.mainContext);
+        }
+    },
+
+    startNewGame: function () {
+        this.gameStarted = true;
+        this.screenMessage = null;
+        this.hintMessage = null;
+
+        this.drawBackground();
+        this.resetObjects();
+        this.loadLevel();
+        this.createPadObject();
+        this.createBallObject();
+
+        for (var i = 0; i < this.levelData.length; i++) {
+            this.createBrickObject(this.levelData[i]);
+        }
+
+        this.bricksUpdated = true;
+        this.gamePaused = true;
     },
 
     loadLevel: function () {
         this.levelData = LEVELS[this.level - 1];
     },
 
-    start: function () {
-        this.loadLevel();
-        this.createObjects();
-        this.initializeImages();
-    },
+    createPadObject: function (options) {
+        this.pad = new Pad(options);
+        this.objects.push(this.pad);
 
-///////////////////////////////////////////
-
-    createObjects: function () {
-        this.createBallObject();
-        this.createPadObject();
-
-        for (var i = 0; i < this.levelData.length; i++) {
-            this.createBrickObject(this.levelData[i]);
-        }
+        return this.pad
     },
 
     createBallObject: function (options) {
-        options = options || this.ballData;
+        options = options || {};
         var obj = new Ball(options);
         this.balls.push(obj);
         this.objects.push(obj);
@@ -94,13 +181,68 @@ Ar.prototype = {
         return obj;
     },
 
-    createPadObject: function (options) {
-        options = options || this.padData;
-        this.pad = new Pad(options);
-        this.objects.push(this.pad);
+    createBrickObject: function (options) {
+        var obj = new Brick(options);
+        this.bricks.push(obj);
 
-        return this.pad
+        return obj;
     },
+
+    animate: function (now) {
+        ar.fps = ar.calculateFps(now);
+        ar.draw(now);
+        requestAnimationFrame(ar.animate);
+    },
+
+    draw: function (now) {
+        if (!ar.gamePaused) {
+            this.updateObjects(now);
+        }
+
+        if (this.bricksUpdated) {
+            this.updateBricks(now);
+        }
+
+        this.drawBricks();
+        this.drawObjects();
+    },
+
+    drawBricks: function () {
+        if (this.bricksUpdated) {
+            this.bricksContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
+            for (var i = 0; i < this.bricks.length; i++) {
+                this.bricks[i].draw(this.bricksContext);
+            }
+        }
+
+        this.bricksUpdated = false;
+    },
+///////////////////////////////////////////////////////////////////////
+
+    processControlPanelClick: function (point) {
+        for (var i = 0; i < this.buttons.length; i++) {
+            var button = this.buttons[i];
+
+            if (pointInObject(point, button)) {
+                switch (button.buttonType) {
+                    case BUTTON_TYPE_START:
+                        this.startNewGame();
+                        break;
+                    case BUTTON_TYPE_PAUSE:
+                        this.gamePaused = !this.gamePaused;
+                        break;
+                    case BUTTON_TYPE_SAVE:
+                        break;
+                    case BUTTON_TYPE_LOAD:
+                        break;
+                }
+
+                return;
+            }
+        }
+    },
+
+///////////////////////////////////////////////////////////////////////
 
     createBonusObject: function (options) {
         var obj = new Bonus(options);
@@ -110,17 +252,21 @@ Ar.prototype = {
         return obj;
     },
 
-    createBrickObject: function (options) {
-        var obj = new Brick(options);
-        this.bricks.push(obj);
-        this.objects.push(obj);
-
-        return obj;
+    drawObjects: function () {
+        this.mainContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
+        for (var i = 0; i < this.objects.length; i++) {
+            this.objects[i].draw(this.mainContext);
+        }
     },
 
-    drawObjects: function () {
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].draw(this.context);
+    updateBricks: function (now) {
+        var brick;
+        for (var i = 0; i < this.bricks.length; i++) {
+            brick = this.bricks[i];
+            brick.update(now);
+            if (!brick.alive) {
+                this.bricks.splice(i, 1);
+            }
         }
     },
 
@@ -166,28 +312,21 @@ Ar.prototype = {
         }
     },
 
-///////////////////////////////////////////
+    calculateFps: function (now) {
+        var fps = 1000 / (now - this.lastAnimationFrameTime);
+        this.lastAnimationFrameTime = now;
 
-    initializeImages: function () {
-        var self = this;
-        this.background.src = SPRITE_BACKGROUND_1;
-        SPRITESHEET.src = SPRITESHEET_SRC;
-        SPRITESHEET.onload = function () {
-            self.startGame();
-        };
+        if (now - this.lastFpsUpdateTime > 1000) {
+            this.lastFpsUpdateTime = now;
+            this.fpsElement.innerHTML = this.fps.toFixed(0) + ' fps';
+        }
+
+        this.frameCounter++;
+        $('#frame-counter').html(this.frameCounter);
+
+        return fps;
     },
 
-    startGame: function () {
-        requestAnimationFrame(this.animate);
-    },
-
-    pause: function () {
-        this.paused = true;
-    },
-
-    togglePause: function () {
-        this.paused = !this.paused;
-    },
 
     saveGame: function () {
         var data = {
@@ -230,7 +369,7 @@ Ar.prototype = {
             this.createBrickObject(data.bricks[i]);
         }
 
-        this.paused = true;
+        this.gamePaused = true;
     },
 
 ///////////////////////////////////////////
@@ -238,55 +377,16 @@ Ar.prototype = {
     movePad: function (device, option) {
         this.pad.moveDevice = device;
         this.pad.moveOption = option;
-    },
-
-///////////////////////////////////////////
-
-    drawBackground: function () {
-//        this.context.globalAlpha = 0.01;
-        this.context.drawImage(this.background, 0, 0,
-            800, 600,
-            0, 0,
-            800, 600);
-        this.context.globalAlpha = 1;
-    },
-
-    draw: function (now) {
-        this.drawBackground();
-        this.updateObjects(now);
-        this.drawObjects();
-    },
-
-    animate: function (now) {
-        if (window.DEBUG_STOP_ON_FRAME != undefined && DEBUG_STOP_ON_FRAME !== false) {
-            if (DEBUG_STOP_ON_FRAME-- == 0) {
-                ar.pause();
-            }
-        }
-
-
-        if (!ar.paused) {
-            ar.fps = ar.calculateFps(now);
-        }
-
-        if (!ar.paused) {
-            ar.draw(now);
-        } else if (ar.processOneFrame) {
-            ar.draw(now);
-            ar.processOneFrame = false;
-        }
-
-        requestAnimationFrame(ar.animate);
     }
+
 }
 ;
 // Запуск
 var ar;
 
 $(function () {
-    ar = new Ar('scene');
-    ar.start();
-
+    ar = new Ar('#game-cont');
+    ar.startScreen();
 
 
 // Обработчики собыйтий
@@ -300,59 +400,35 @@ $(function () {
             case 39: // right arrow
                 ar.movePad(DEVICE_KEYBOARD, RIGHT);
                 break;
-            case 107: // numpad +
+            case 80: // P
+                ar.gamePaused = !ar.gamePaused;
                 break;
         }
     };
 
     window.onmousemove = function (event) {
-        if (event.pageX > ar.contextXLeft && event.pageX < ar.contextXRight) {
+        if (!ar.gameStarted || ar.gamePaused) {
+            return;
+        }
+        if (event.pageX > ar.mainCanvasLeft && event.pageX < ar.mainCanvasLeft + PG_WIDTH) {
             ar.movePad(DEVICE_MOUSE, event.pageX);
         }
     };
 
-    $(window).on('click', function (event) {
-        if (event.pageX > ar.contextXLeft && event.pageX < ar.contextXRight) {
+    window.onclick = function (event) {
+        var point = new Point(event.pageX, event.pageY);
+        var pgRect = new Rect(ar.mainCanvasLeft, ar.mainCanvasTop, PG_WIDTH, CONTEXT_HEIGHT);
+        var ctrlRect = new Rect(ar.mainCanvasLeft + PG_WIDTH, ar.mainCanvasTop, CTRL_WIDTH, CONTEXT_HEIGHT);
 
-            if (!ar.paused) {
-                ar.paused = true;
-                return;
-            }
-
-            var mLeft = event.pageX - ar.contextXLeft;
-            var mTop = event.pageY;
-
-            var unpause = true;
-            for (var i = 0; i < ar.objects.length; i++) {
-                var obj = ar.objects[i];
-
-                if (mLeft > obj.left && mLeft < obj.left + obj.width && mTop > obj.top && mTop < obj.top + obj.height) {
-                    if (event.ctrlKey) {
-                        ar.removeObject(obj)
-                    } else {
-                        c(obj);
-                    }
-
-                    unpause = false;
-                }
-            }
-
-            if (ar.paused && unpause) {
-                ar.paused = false;
-            }
-
+        if (pointInObject(point, pgRect)) {
+        } else if (pointInObject(point, ctrlRect)) {
+            ar.processControlPanelClick(new Point(event.pageX - ar.mainCanvasLeft, event.pageY - ar.mainCanvasTop));
         }
-    });
+    };
 
-    $('#buttons').css({
-        top : $(ar.canvas).offset().top + 'px',
-        left: ar.contextXRight + 'px'
-    })
+//    $('#buttons').css({
+//        top : $(ar.canvas).offset().top + 'px',
+//        left: ar.mainCanvasLeft + PG_WIDTH + CTRL_WIDTH + 'px'
+//    })
 
 });
-
-
-//24.27688735
-//0.02073
-//0.50326 BTC
-//0.0486 LTC

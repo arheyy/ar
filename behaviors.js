@@ -50,7 +50,7 @@ var moveBallBehavior = {
             var brick = ar.bricks[i];
 
             if (brick.health <= 0) {
-                return;
+                continue;
             }
 
             var horizontalSide = ball.dy > 0 ? TOP : BOT;
@@ -67,13 +67,6 @@ var moveBallBehavior = {
                 var kx = Math.abs(horizontalIntersect[0].x - verticalIntersect[0].x);
                 var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
 
-//                if (equalPresision(kx, ky)) {
-//
-//                    ball.invertXDirection();
-//                    ball.invertYDirection();
-//                    touchSide = [horizontalSide, verticalSide];
-//
-//                } else
                 if (kx > ky) {
 
                     ball.invertYDirection();
@@ -113,6 +106,7 @@ var moveBallBehavior = {
         } else if (this.processPadCollision(ball)) {
             return true;
         } else if (this.processBricksCollisions(ball)) {
+            ar.bricksUpdated = true;
             return true;
         }
 
@@ -135,14 +129,14 @@ var movePadBehavior = {
             if (pad.moveOption == LEFT) {
                 pad.left = Math.max(pad.left - PAD_MOVE_DELTA, 0);
             } else if (pad.moveOption == RIGHT) {
-                pad.left = Math.min(pad.left + PAD_MOVE_DELTA, CONTEXT_WIDTH - pad.width);
+                pad.left = Math.min(pad.left + PAD_MOVE_DELTA, PG_WIDTH - pad.width);
             }
 
             pad.moveDevice = false;
         } else if (pad.moveDevice == DEVICE_MOUSE) {
 
-            pad.left = Math.max(pad.moveOption - ar.contextXLeft - (pad.width / 2), 0);
-            pad.left = Math.min(CONTEXT_WIDTH - pad.width, pad.left);
+            pad.left = Math.max(pad.moveOption - ar.mainCanvasLeft - (pad.width / 2), 0);
+            pad.left = Math.min(PG_WIDTH - pad.width, pad.left);
 
             pad.moveDevice = false;
         }

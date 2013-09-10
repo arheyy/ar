@@ -13,13 +13,12 @@ var Editor = function (canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.context = this.canvas.getContext('2d');
 
-    this.contextWidth = this.context.canvas.width;
     this.contextHeight = this.context.canvas.height;
 
     this.contextXLeft = $(this.canvas).offset().left;
-    this.contextXRight = this.contextXLeft + this.contextWidth;
-    this.contextYTop = $(this.canvas).offset().top;
-    this.contextYBot = this.contextYTop + this.contextHeight;
+    this.contextXRight = this.contextXLeft + this.PG_WIDTH;
+    this.mainCanvasTop = $(this.canvas).offset().top;
+    this.contextYBot = this.mainCanvasTop + this.contextHeight;
 
     this.controls = [];
 
@@ -80,13 +79,13 @@ Editor.prototype = {
         this.context.beginPath();
         this.context.lineWidth = 1;
         this.context.fillStyle = 'white';
-        this.context.fillRect(0, 0, this.contextWidth, this.contextHeight);
+        this.context.fillRect(0, 0, this.PG_WIDTH, this.contextHeight);
 
         this.context.beginPath();
         this.context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
         this.context.lineWidth = 1;
 
-        var xCnt = this.contextWidth / BRICK_WIDTH;
+        var xCnt = this.PG_WIDTH / BRICK_WIDTH;
         for (var i = 0; i <= xCnt; i++) {
             this.context.moveTo(i * BRICK_WIDTH, CONTROL_PANEL_HEIGHT);
             this.context.lineTo(i * BRICK_WIDTH, this.contextHeight);
@@ -95,7 +94,7 @@ Editor.prototype = {
         var yCnt = this.contextHeight / BRICK_HEIGHT;
         for (var j = 0; j <= yCnt; j++) {
             this.context.moveTo(0, CONTROL_PANEL_HEIGHT + j * BRICK_HEIGHT);
-            this.context.lineTo(this.contextWidth, CONTROL_PANEL_HEIGHT + j * BRICK_HEIGHT);
+            this.context.lineTo(this.PG_WIDTH, CONTROL_PANEL_HEIGHT + j * BRICK_HEIGHT);
         }
 
         this.context.stroke();
@@ -282,7 +281,7 @@ $(window).on('mousedown', function (event) {
 
     if (event.pageX > editor.contextXLeft
         && event.pageX < editor.contextXRight
-        && event.pageY > editor.contextYTop
+        && event.pageY > editor.mainCanvasTop
         && event.pageY < editor.contextYBot
         ) {
 
@@ -305,7 +304,7 @@ $(window).on('mousemove', function (event) {
     if (mousePressed !== false) {
         if (event.pageX > editor.contextXLeft
             && event.pageX < editor.contextXRight
-            && event.pageY > editor.contextYTop + CONTROL_PANEL_HEIGHT
+            && event.pageY > editor.mainCanvasTop + CONTROL_PANEL_HEIGHT
             && event.pageY < editor.contextYBot
             ) {
 

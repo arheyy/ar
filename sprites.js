@@ -172,10 +172,6 @@ MetalWallSprite.prototype = {
     }
 };
 
-var Sprite = function (owner) {
-    return this;
-};
-
 var BallSprite = function (object, cells) {
     this.object = object;
     this.cells = cells;
@@ -186,6 +182,7 @@ var BallSprite = function (object, cells) {
 BallSprite.prototype = {
     draw: function (context) {
         var cell = this.cells[this.object.size];
+
         context.drawImage(SPRITESHEET, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
@@ -196,6 +193,36 @@ BallSprite.prototype = {
     }
 };
 
+var ButtonSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+ButtonSprite.prototype = {
+    draw: function (context) {
+        var cell = this.cells[this.object.buttonType];
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+
+        context.font = "italic 10pt Arial";
+        context.textBaseline = "middle";
+        context.textAlign = "center";
+        context.fillStyle = 'black';
+        context.fillText(this.object.label, this.object.left + this.object.width / 2, this.object.top + this.object.height / 2);
+    },
+
+    update: function (time) {
+    }
+};
+
+var Sprite = function (owner) {
+    return this;
+};
+
 Sprite.prototype = {
     draw: function (context) {
 
@@ -203,11 +230,11 @@ Sprite.prototype = {
             return;
         }
 
-        context.save();
+//        context.save();
 
         this.artist.draw(this, context);
 
-        context.restore();
+//        context.restore();
     },
 
     update: function (time, fps) {

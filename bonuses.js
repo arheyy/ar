@@ -7,20 +7,14 @@ Ar.prototype.bonusDecreasePad = function () {
 };
 
 Ar.prototype.bonusIncreaseSpeed = function () {
-    var ball;
     for (var i = 0; i < this.balls.length; i++) {
-        ball = this.balls[i];
-        var speed = Math.min(ball.speed + BALL_SPEED_DELTA, BALL_MAX_SPEED);
-        ball.setSpeed(speed);
+        this.balls[i].incSpeed();
     }
 };
 
 Ar.prototype.bonusDecreaseSpeed = function () {
-    var ball;
     for (var i = 0; i < this.balls.length; i++) {
-        ball = this.balls[i];
-        var speed = Math.max(ball.speed - BALL_SPEED_DELTA, BALL_MIN_SPEED);
-        ball.setSpeed(speed);
+        this.balls[i].decSpeed();
     }
 };
 
@@ -39,6 +33,7 @@ Ar.prototype.bonusTripleBall = function () {
         anotherBall.setAng(anotherBallAng);
 
     }
+    this.bonusIncreaseSpeed();
 };
 
 Ar.prototype.bonusSmallBall = function () {
