@@ -1,8 +1,8 @@
 var Ar = function (contId) {
     var bgCanvas = $('<canvas/>')
-        .attr('width', PG_WIDTH)
-        .attr('height', CONTEXT_HEIGHT)
-        .css({position: 'absolute'})
+            .attr('width', PG_WIDTH)
+            .attr('height', CONTEXT_HEIGHT)
+            .css({position: 'absolute'})
         ;
 
     $(contId).append(bgCanvas);
@@ -20,17 +20,12 @@ var Ar = function (contId) {
     this.bricksContext = bricksCanvas[0].getContext('2d');
 
     var mainCanvas = $('<canvas/>')
-        .attr('width', CONTEXT_WIDTH)
-        .attr('height', CONTEXT_HEIGHT)
-        .css({position: 'absolute'})
-    ;
+            .attr('width', CONTEXT_WIDTH)
+            .attr('height', CONTEXT_HEIGHT)
+            .css({position: 'absolute'})
+        ;
 
     $(contId).append(mainCanvas);
-
-    //////////////////
-
-
-    /////////////////
 
 
     this.mainContext = mainCanvas[0].getContext('2d');
@@ -52,7 +47,6 @@ var Ar = function (contId) {
 
     // Спрайты
     this.buttons = [];
-    this.objects = [];
     this.pad = null;
     this.balls = [];
     this.bonuses = [];
@@ -60,17 +54,12 @@ var Ar = function (contId) {
 
     this.bricksUpdated = true;
 
-//    this.leftBrick = null;
-//    this.rightBrick = null;
-//    this.topBrick = null;
-//    this.botBrick = null;
-
-    // Images
     this.background = new Image();
 
     this.level = 1;
     this.levelData = null;
 
+    this.lives = DEFAULT_LIVES_AMOUNT;
 };
 
 Ar.prototype = {
@@ -83,7 +72,7 @@ Ar.prototype = {
         this.background.src = SPRITE_BACKGROUND_1;
         var self = this;
         SPRITESHEET.src = SPRITESHEET_SRC;
-        SPRITESHEET.onload = function() {
+        SPRITESHEET.onload = function () {
             self.drawBackground();
             self.createButtons();
             requestAnimationFrame(self.animate);
@@ -92,7 +81,6 @@ Ar.prototype = {
     },
 
     resetObjects: function () {
-        this.objects = [];
         this.pad = null;
         this.balls = [];
         this.bonuses = [];
@@ -158,7 +146,6 @@ Ar.prototype = {
         }
 
         this.bricksUpdated = true;
-        this.gamePaused = true;
     },
 
     loadLevel: function () {
@@ -167,23 +154,67 @@ Ar.prototype = {
 
     createPadObject: function (options) {
         this.pad = new Pad(options);
-        this.objects.push(this.pad);
 
         return this.pad
     },
 
+    // Ball
     createBallObject: function (options) {
         options = options || {};
         var obj = new Ball(options);
         this.balls.push(obj);
-        this.objects.push(obj);
 
         return obj;
     },
 
+    updateBalls: function (now) {
+        var ball;
+        for (var i = 0; i < this.balls.length; i++) {
+            ball = this.balls[i];
+            ball.update(now);
+            if (!ball.alive) {
+                this.balls.splice(i, 1);
+            }
+        }
+    },
+
+    drawBalls: function () {
+        for (var i = 0; i < this.balls.length; i++) {
+            this.balls[i].draw(this.mainContext);
+        }
+    },
+
+    updateBricks: function (now) {
+        var brick;
+        for (var i = 0; i < this.bricks.length; i++) {
+            brick = this.bricks[i];
+            brick.update(now);
+            if (!brick.alive) {
+                this.generateBonus(brick);
+                this.bricks.splice(i, 1);
+            }
+        }
+    },
+
+    drawBricks: function () {
+        for (var i = 0; i < this.bricks.length; i++) {
+            this.bricks[i].draw(this.bricksContext);
+        }
+
+        this.bricksUpdated = false;
+    },
+
+    // Brick
     createBrickObject: function (options) {
         var obj = new Brick(options);
         this.bricks.push(obj);
+
+        return obj;
+    },
+
+    createBonusObject: function (options) {
+        var obj = new Bonus(options);
+        this.bonuses.push(obj);
 
         return obj;
     },
@@ -195,28 +226,71 @@ Ar.prototype = {
     },
 
     draw: function (now) {
-        if (!ar.gamePaused) {
-            this.updateObjects(now);
+        if (ar.gamePaused) {
+            return;
         }
 
-        if (this.bricksUpdated) {
-            this.updateBricks(now);
-        }
-
-        this.drawBricks();
-        this.drawObjects();
-    },
-
-    drawBricks: function () {
         if (this.bricksUpdated) {
             this.bricksContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
-            for (var i = 0; i < this.bricks.length; i++) {
-                this.bricks[i].draw(this.bricksContext);
-            }
+            this.updateBricks(now);
+            this.drawBricks();
         }
 
-        this.bricksUpdated = false;
+        this.mainContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
+
+        this.updateBalls();
+        this.drawBalls();
+
+        this.pad.update(now);
+        this.pad.draw(this.mainContext);
+
+        if (this.bonuses.length) {
+            this.updateBonuses();
+            this.drawBonuses();
+        }
     },
+
+
+
+    updateBonuses: function (now) {
+        var bonus;
+        for (var i = 0; i < this.bonuses.length; i++) {
+            bonus = this.bonuses[i];
+            bonus.update(now);
+            if (!bonus.alive) {
+                this.bonuses.splice(i, 1);
+            }
+        }
+    },
+
+    drawBonuses: function () {
+        for (var i = 0; i < this.bonuses.length; i++) {
+            this.bonuses[i].draw(this.mainContext);
+        }
+    },
+
+    removeBonus: function (obj) {
+        for (var i = 0; i < this.bonuses.length; i++) {
+            if (this.bonuses[i] === obj) {
+                this.bonuses.splice(i, 1);
+            }
+        }
+    },
+
+    generateBonus: function (brick) {
+        if (randInt(5) != 0) {
+            return;
+        }
+
+        var index = randInt(BONUS.types.length);
+
+        this.createBonusObject({
+            type: BONUS.types[index],
+            left: brick.left + (brick.width - BONUS.size) / 2,
+            top : brick.top + (brick.height - BONUS.size) / 2
+        });
+    },
+
 ///////////////////////////////////////////////////////////////////////
 
     processControlPanelClick: function (point) {
@@ -242,75 +316,17 @@ Ar.prototype = {
         }
     },
 
+
 ///////////////////////////////////////////////////////////////////////
-
-    createBonusObject: function (options) {
-        var obj = new Bonus(options);
-        this.bonuses.push(obj);
-        this.objects.push(obj);
-
-        return obj;
-    },
-
-    drawObjects: function () {
-        this.mainContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
-        for (var i = 0; i < this.objects.length; i++) {
-            this.objects[i].draw(this.mainContext);
-        }
-    },
-
-    updateBricks: function (now) {
-        var brick;
-        for (var i = 0; i < this.bricks.length; i++) {
-            brick = this.bricks[i];
-            brick.update(now);
-            if (!brick.alive) {
-                this.bricks.splice(i, 1);
-            }
-        }
-    },
-
-    updateObjects: function (now) {
-        var object;
-        for (var i = 0; i < this.objects.length; i++) {
-            object = this.objects[i];
-            object.update(now);
-            if (!object.alive) {
-                this.removeObject(object);
-            }
-        }
-    },
-
-    removeObject: function (obj) {
-        for (var i = 0; i < this.objects.length; i++) {
-
-            if (this.objects[i] === obj) {
-
-                this.objects.splice(i, 1);
-
-                switch (obj.type) {
-                    case OBJECT_TYPE_BALL:
-                        this.removeTypedObject(this.balls, obj);
-                        break;
-                    case OBJECT_TYPE_BONUS:
-                        this.removeTypedObject(this.bonuses, obj);
-                        break;
-                    case OBJECT_TYPE_BRICK:
-                        this.removeTypedObject(this.bricks, obj);
-                        break;
-                }
-            }
-        }
-    },
-
-    removeTypedObject: function (arr, obj) {
-        for (var i = 0; i < arr.length; i++) {
-
-            if (arr[i] === obj) {
-                arr.splice(i, 1);
-            }
-        }
-    },
+//
+//    removeTypedObject: function (arr, obj) {
+//        for (var i = 0; i < arr.length; i++) {
+//
+//            if (arr[i] === obj) {
+//                arr.splice(i, 1);
+//            }
+//        }
+//    },
 
     calculateFps: function (now) {
         var fps = 1000 / (now - this.lastAnimationFrameTime);
@@ -347,7 +363,6 @@ Ar.prototype = {
 
         data = JSON.parse(data);
 
-        this.objects = [];
         this.pad = null;
         this.bonuses = [];
         this.balls = [];

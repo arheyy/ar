@@ -27,11 +27,7 @@ function randInt(min, max) {
         min = 0;
     }
 
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function equalPresision(a, b) {
-    return (a - b) < 0.01
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function isBallHorizontalIntersected(ball, line) {

@@ -1,5 +1,5 @@
 var Ball = function (options) {
-    this.type = OBJECT_TYPE_BALL;
+    this.oType = OBJECT_TYPE_BALL;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
     this.size = options.size || BALL_NORMAL_SIZE;
     this.width = this.size;
@@ -145,7 +145,7 @@ Ball.prototype = {
 
 var Pad = function (options) {
     options = options || {};
-    this.type = OBJECT_TYPE_PAD;
+    this.oType = OBJECT_TYPE_PAD;
     this.setSize(options.size || PAD_DEFAULT_SIZE);
     this.left = options.left || (PG_WIDTH - this.width) / 2;
     this.height = PAD_HEIGHT;
@@ -181,47 +181,50 @@ Pad.prototype = {
     }
 };
 
-//var Bonus = function (options) {
-//    this.type = OBJECT_TYPE_BONUS;
-//    this.effect = options.effect;
-//    this.width = BONUS_SIZE;
-//    this.height = BONUS_SIZE;
-//    this.left = options.left;
-//    this.top = options.top;
-//    this.dy = BONUS_SPEED;
-//    this.alive = true;
-//
-//    this.artist = new SpriteSheetArtist(SPRITE_ARRAY_BONUS_TYPE_PAD_INCREASE);
-//    this.behaviors = [
-//        bonusBehavior,
-//    ];
-//
-//    this.sprite = new Sprite(this);
-//
-//};
-//
-//Bonus.prototype = {
-//
-//    draw: function (context) {
-//        this.sprite.draw.call(this, context);
-//    },
-//
-//    update: function (time, fps) {
-//        this.sprite.update.call(this, time, fps);
-//    },
-//
-//    move: function () {
-//        this.top += this.dy;
-//    }
-//};
+var Bonus = function (options) {
+    this.oType = OBJECT_TYPE_BONUS;
+    this.type = options.type;
+    this.width = BONUS.size;
+    this.height = BONUS.size;
+    this.left = options.left;
+    this.top = options.top;
+    this.dy = BONUS.speed;
+    this.alive = true;
+
+    this.behaviors = [
+        bonusBehavior,
+    ];
+
+    this.sprites = [ new BonusSprite(this, BONUS.sprites) ];
+
+};
+
+Bonus.prototype = {
+
+    draw: function (context) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].draw(context);
+        }
+    },
+
+    update: function (time) {
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].update(time);
+        }
+
+        for (i = 0; i < this.behaviors.length; i++) {
+            this.behaviors[i].execute(this, time);
+        }
+    }
+};
 
 var Brick = function (options) {
-    this.type = OBJECT_TYPE_BRICK;
+    this.oType = OBJECT_TYPE_BRICK;
     this.brickType = options.brickType;
-    this.lives = BRICK_LIVES[this.brickType];
+    this.lives = BRICK.lives[this.brickType];
     this.health = this.lives;
-    this.width = BRICK_WIDTH;
-    this.height = BRICK_HEIGHT;
+    this.width = BRICK.width;
+    this.height = BRICK.height;
     this.left = options.left;
     this.top = options.top;
     this.metalWalls = options.metalWalls || [];
@@ -230,9 +233,9 @@ var Brick = function (options) {
     this.behaviors = [];
 
     this.sprites = [
-        new BrickSprite(this, SPRITE_BRICKS),
-        new BrokenSprite(this, SPRITE_BROKEN),
-        new MetalWallSprite(this, SPRITE_METAL_WALL)
+        new BrickSprite(this, BRICK.sprites.bricks),
+        new BrokenSprite(this, BRICK.sprites.broken),
+        new MetalWallSprite(this, BRICK.sprites.metalWalls)
     ];
 };
 
@@ -306,7 +309,7 @@ Brick.prototype = {
 };
 
 var Button = function (buttonType) {
-    this.type = OBJECT_TYPE_BUTTON;
+    this.oType = OBJECT_TYPE_BUTTON;
     this.buttonType = buttonType;
     this.width = BUTTON_WIDTH;
     this.height = BUTTON_HEIGHT;

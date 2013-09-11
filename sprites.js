@@ -219,6 +219,33 @@ ButtonSprite.prototype = {
     }
 };
 
+var BonusSprite = function (object, cells) {
+    this.object = object;
+    this.cells = cells;
+
+    return this;
+};
+
+BonusSprite.prototype = {
+    draw: function (context) {
+        var carcass = BONUS.sprites['bonusCarcass']
+        var cell = BONUS.sprites[this.object.type];
+
+        context.drawImage(SPRITESHEET, carcass.left, carcass.top,
+            carcass.width, carcass.height,
+            this.object.left, this.object.top,
+            carcass.width, carcass.height);
+
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            cell.width, cell.height);
+    },
+
+    update: function (time) {
+    }
+};
+
 var Sprite = function (owner) {
     return this;
 };

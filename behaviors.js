@@ -8,6 +8,7 @@ var moveBallBehavior = {
             ball.invertYDirection();
             return true;
         } else if (ball.isBotWallCollision()) {// Не поймали
+//            ball.alive = false;
             ball.invertYDirection();
             return true;
         }
@@ -149,7 +150,9 @@ var bonusBehavior = {
     execute: function (bonus, time, fps) {
         // Бонус не пойман
         if (bonus.top > CONTEXT_HEIGHT) {
-            ar.removeObject(bonus);
+            ar.removeBonus(bonus);
+
+            return;
         }
 
         // Бонус пойман
@@ -160,28 +163,39 @@ var bonusBehavior = {
             ) {
 
             this.applyEffect(bonus);
-            ar.removeObject(bonus);
+            ar.removeBonus(bonus);
+
+            return;
         }
 
         bonus.top += bonus.dy;
     },
 
     applyEffect: function (bonus) {
-        switch (bonus.effect) {
-            case BONUS_TYPE_PAD_INCREASE:
+        switch (bonus.type) {
+            case 'padIncrease':
                 ar.bonusIncreasePad();
                 break;
-            case BONUS_TYPE_PAD_DECREASE:
+            case 'padDecrease':
                 ar.bonusDecreasePad();
                 break;
-            case BONUS_TYPE_SPEED_INCREASE:
+            case 'speedIncrease':
                 ar.bonusIncreaseSpeed()
                 break;
-            case BONUS_TYPE_SPEED_DECREASE:
+            case 'speedDecrease':
                 ar.bonusDecreaseSpeed();
                 break;
-            case BONUS_TYPE_TRIPLE_BALL:
+            case 'ballTriple':
                 ar.bonusTripleBall();
+                break;
+            case 'ballSmall':
+                ar.bonusSmallBall();
+                break;
+            case 'ballBig':
+                ar.bonusBigBall();
+                break;
+            case 'ballReset':
+                ar.bonusResetBall();
                 break;
         }
     }

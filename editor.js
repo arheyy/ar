@@ -16,7 +16,7 @@ var Editor = function (canvasId) {
     this.contextHeight = this.context.canvas.height;
 
     this.contextXLeft = $(this.canvas).offset().left;
-    this.contextXRight = this.contextXLeft + this.PG_WIDTH;
+    this.contextXRight = this.contextXLeft + PG_WIDTH;
     this.mainCanvasTop = $(this.canvas).offset().top;
     this.contextYBot = this.mainCanvasTop + this.contextHeight;
 
@@ -30,9 +30,9 @@ Editor.prototype = {
 
     createControls: function () {
         var i;
-        for (i = 0; i < SPRITE_BRICKS.length; i++) {
+        for (i = 0; i < Object.keys(BRICK.sprites.bricks).length; i++) {
             this.controls.push(new Brick({
-                left: i * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+                left: i * (BRICK.width + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
                 top: BRICK_TOP_OFFSET,
                 brickType: i
             }));
@@ -40,35 +40,35 @@ Editor.prototype = {
 
         this.controls.push(new Brick({
             left: BRICK_LEFT_OFFSET,
-            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            top: 2 * (BRICK_TOP_OFFSET + BRICK.height),
             brickType: 0,
             metalWalls: [TOP]
         }));
 
         this.controls.push(new Brick({
-            left: (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            left: (BRICK.width + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK.height),
             brickType: 0,
             metalWalls: [BOT]
         }));
 
         this.controls.push(new Brick({
-            left: 2 * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            left: 2 * (BRICK.width + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK.height),
             brickType: 0,
             metalWalls: [LEFT]
         }));
 
         this.controls.push(new Brick({
-            left: 3 * (BRICK_WIDTH + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
-            top: 2 * (BRICK_TOP_OFFSET + BRICK_HEIGHT),
+            left: 3 * (BRICK.width + BRICK_BETWEEN_DISTANCE) + BRICK_LEFT_OFFSET,
+            top: 2 * (BRICK_TOP_OFFSET + BRICK.height),
             brickType: 0,
             metalWalls: [RIGHT]
         }));
 
         this.previewBrick = new Brick({
-            left: PREVIEW_LEFT + (PREVIEW_WIDTH - BRICK_WIDTH) / 2,
-            top: PREVIEW_TOP + (PREVIEW_HEIGHT - BRICK_HEIGHT) / 2,
+            left: PREVIEW_LEFT + (PREVIEW_WIDTH - BRICK.width) / 2,
+            top: PREVIEW_TOP + (PREVIEW_HEIGHT - BRICK.height) / 2,
             brickType: 0
         });
 
@@ -79,22 +79,22 @@ Editor.prototype = {
         this.context.beginPath();
         this.context.lineWidth = 1;
         this.context.fillStyle = 'white';
-        this.context.fillRect(0, 0, this.PG_WIDTH, this.contextHeight);
+        this.context.fillRect(0, 0, PG_WIDTH, this.contextHeight);
 
         this.context.beginPath();
         this.context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
         this.context.lineWidth = 1;
 
-        var xCnt = this.PG_WIDTH / BRICK_WIDTH;
+        var xCnt = PG_WIDTH / BRICK.width;
         for (var i = 0; i <= xCnt; i++) {
-            this.context.moveTo(i * BRICK_WIDTH, CONTROL_PANEL_HEIGHT);
-            this.context.lineTo(i * BRICK_WIDTH, this.contextHeight);
+            this.context.moveTo(i * BRICK.width, CONTROL_PANEL_HEIGHT);
+            this.context.lineTo(i * BRICK.width, this.contextHeight);
         }
 
-        var yCnt = this.contextHeight / BRICK_HEIGHT;
+        var yCnt = this.contextHeight / BRICK.height;
         for (var j = 0; j <= yCnt; j++) {
-            this.context.moveTo(0, CONTROL_PANEL_HEIGHT + j * BRICK_HEIGHT);
-            this.context.lineTo(this.PG_WIDTH, CONTROL_PANEL_HEIGHT + j * BRICK_HEIGHT);
+            this.context.moveTo(0, CONTROL_PANEL_HEIGHT + j * BRICK.height);
+            this.context.lineTo(PG_WIDTH, CONTROL_PANEL_HEIGHT + j * BRICK.height);
         }
 
         this.context.stroke();
@@ -142,8 +142,8 @@ Editor.prototype = {
 
     processGridClick: function (point, button, ctrl) {
 
-        var top = point.top - (point.top - CONTROL_PANEL_HEIGHT) % BRICK_HEIGHT;
-        var left = point.left - point.left % BRICK_WIDTH;
+        var top = point.top - (point.top - CONTROL_PANEL_HEIGHT) % BRICK.height;
+        var left = point.left - point.left % BRICK.width;
 
         var brick;
         for (var i = 0; i < this.bricks.length; i++) {
@@ -296,7 +296,7 @@ $(window).on('mousedown', function (event) {
     }
 });
 
-$(window).on('mouseup', function (event) {
+$(window).on('mouseup', function () {
     mousePressed = false;
 });
 
