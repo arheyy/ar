@@ -1,9 +1,9 @@
 Ar.prototype.bonusIncreasePad = function () {
-    this.pad.setSize(Math.min(this.pad.size + 2, PAD_MAX_SIZE));
+    this.pad.setSize(Math.min(this.pad.size + 1, PAD.maxSize));
 };
 
 Ar.prototype.bonusDecreasePad = function () {
-    this.pad.setSize(Math.max(this.pad.size - 2, PAD_MIN_SIZE));
+    this.pad.setSize(Math.max(this.pad.size - 1, PAD.minSize));
 };
 
 Ar.prototype.bonusIncreaseSpeed = function () {
@@ -38,19 +38,19 @@ Ar.prototype.bonusTripleBall = function () {
 
 Ar.prototype.bonusSmallBall = function () {
     for (var i = 0; i < this.balls.length; i++) {
-        this.balls[i].setSize(BALL_SMALL_SIZE);
+        this.balls[i].setSize('small');
     }
 };
 
 Ar.prototype.bonusBigBall = function () {
     for (var i = 0; i < this.balls.length; i++) {
-        this.balls[i].setSize(BALL_BIG_SIZE);
+        this.balls[i].setSize('big');
     }
 };
 
 Ar.prototype.bonusResetBall = function () {
     for (var i = 0; i < this.balls.length; i++) {
-        this.balls[i].setSize(BALL_NORMAL_SIZE);
+        this.balls[i].setSize('normal');
     }
 };
 

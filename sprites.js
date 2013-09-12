@@ -114,9 +114,7 @@ BrokenSprite.prototype = {
                 cell = this.cells[1];
             }
         }
-        if (!cell) {
-            c(this.object);
-        }
+
         context.drawImage(SPRITESHEET, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
@@ -182,7 +180,6 @@ var BallSprite = function (object, cells) {
 BallSprite.prototype = {
     draw: function (context) {
         var cell = this.cells[this.object.size];
-
         context.drawImage(SPRITESHEET, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
@@ -193,16 +190,16 @@ BallSprite.prototype = {
     }
 };
 
-var ButtonSprite = function (object, cells) {
+var ButtonSprite = function (object, cell) {
     this.object = object;
-    this.cells = cells;
+    this.cell = cell;
 
     return this;
 };
 
 ButtonSprite.prototype = {
     draw: function (context) {
-        var cell = this.cells[this.object.buttonType];
+        var cell = this.cell;
         context.drawImage(SPRITESHEET, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
@@ -246,33 +243,23 @@ BonusSprite.prototype = {
     }
 };
 
-var Sprite = function (owner) {
+var PadSprite = function (object, cell) {
+    this.object = object;
+    this.cell = cell;
+
     return this;
 };
 
-Sprite.prototype = {
+PadSprite.prototype = {
     draw: function (context) {
+        var cell = this.cell;
 
-        if (!this.artist) {
-            return;
-        }
-
-//        context.save();
-
-        this.artist.draw(this, context);
-
-//        context.restore();
+        context.drawImage(SPRITESHEET, cell.left, cell.top,
+            cell.width, cell.height,
+            this.object.left, this.object.top,
+            this.object.width, this.object.height);
     },
 
-    update: function (time, fps) {
-
-        for (var i = 0; i < this.behaviors.length; ++i) {
-
-            if (this.behaviors[i] === undefined) {
-                return;
-            }
-
-            this.behaviors[i].execute(this, time, fps);
-        }
+    update: function (time) {
     }
 };

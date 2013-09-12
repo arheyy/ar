@@ -24,10 +24,35 @@ var moveBallBehavior = {
             (ball.left + ball.dx < ar.pad.left + ar.pad.width)
             ) {
 
-            var padCenter = (ar.pad.left + (ar.pad.width / 2));
             var ballCenter = (ball.left + (ball.width / 2) + ball.dx);
-
+            var padCenter = (ar.pad.left + (ar.pad.width / 2));
             var deltaDistance = padCenter - ballCenter;
+
+            var deltaDistanceAbs = Math.abs(deltaDistance)
+            var kSize = ar.pad.size / PAD.maxSize;
+
+            if (deltaDistanceAbs > 55 * kSize) {
+
+                var ballBot = ball.top + ball.height + ball.dy;
+                var padTop = ar.pad.top;
+
+                if (deltaDistanceAbs < 70 * kSize) {
+                    padTop += 6;
+                } else if (deltaDistanceAbs < 80 * kSize) {
+                    padTop += 8;
+                } else if (deltaDistanceAbs < 90 * kSize) {
+                    padTop += 10;
+                } else if (deltaDistanceAbs < 100 * kSize) {
+                    padTop += 12;
+                } else {
+                    padTop += 14;
+                }
+
+                if (ballBot < padTop) {
+                    return;
+                }
+            }
+
             var halfSumPadWidth = (ar.pad.width + ball.width) / 2;
             var koeff = deltaDistance / halfSumPadWidth;
 
@@ -128,9 +153,9 @@ var movePadBehavior = {
         if (pad.moveDevice == DEVICE_KEYBOARD) {
 
             if (pad.moveOption == LEFT) {
-                pad.left = Math.max(pad.left - PAD_MOVE_DELTA, 0);
+                pad.left = Math.max(pad.left - PAD.moveDelta, 0);
             } else if (pad.moveOption == RIGHT) {
-                pad.left = Math.min(pad.left + PAD_MOVE_DELTA, PG_WIDTH - pad.width);
+                pad.left = Math.min(pad.left + PAD.moveDelta, PG_WIDTH - pad.width);
             }
 
             pad.moveDevice = false;
@@ -149,7 +174,7 @@ var bonusBehavior = {
 
     execute: function (bonus) {
         // Бонус не пойман
-        if (bonus.top > CONTEXT_HEIGHT) {
+        if (bonus.top > PG_HEIGHT) {
             ar.removeBonus(bonus);
 
             return;
@@ -157,7 +182,7 @@ var bonusBehavior = {
 
         // Бонус пойман
         if (
-            (bonus.top + bonus.height >= CONTEXT_HEIGHT - PAD_HEIGHT) &&
+            (bonus.top + bonus.height >= PG_HEIGHT - PAD.height) &&
                 (bonus.left + bonus.width > ar.pad.left) &&
                 (bonus.left < ar.pad.left + ar.pad.width)
             ) {

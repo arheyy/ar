@@ -1,34 +1,79 @@
+var SPRITESHEET = new Image();
+var SPRITESHEET_SRC = 'img/sprites.png';
+var IMAGE_BACKGROUND = 'img/background1.png';
+var IMAGE_BACK = 'img/back.png';
+
+var BG_WIDTH = 1010;
+var BG_HEIGHT = 660;
+
 var PG_WIDTH = 800;
-var CTRL_WIDTH = 150;
-var CONTEXT_HEIGHT = 600;
-var CONTEXT_WIDTH = PG_WIDTH + CTRL_WIDTH;
+var PG_HEIGHT = 600;
+var SIDEBAR_WIDTH = 150;
+
+var DEVICE_KEYBOARD = 1;
+var DEVICE_MOUSE = 2;
+
+var LEFT = 1;
+var RIGHT = 2;
+var TOP = 3;
+var BOT = 4;
+
+var SAVE_DATA_KEY = 'arSaveData';
 
 var DEFAULT_LIVES_AMOUNT = 3;
 
-var SPRITESHEET = new Image();
-var SPRITESHEET_SRC = 'img/sprites.png';
-var SPRITE_BACKGROUND_1 = 'img/background1.png';
+var LEVELS_COUNT = 2;
+var LEVELS = [];
+
+///////////////////////////////////////////////////////////////////////////
+
+var BORDER = {
+    size   : 30,
+    sprites: {
+        TOP  : { top: 0, left: 0, width: 30, height: 860 },
+        BOT  : { top: 0, left: 30, width: 30, height: 860 },
+        LEFT : { top: 0, left: 60, width: 30, height: 600 },
+        RIGHT: { top: 0, left: 90, width: 30, height: 600 }
+    }
+};
+
+var MESSAGES = {
+    greeting  : 'Arheynoid',
+    pressStart: 'Нажмите новая игра'
+};
 
 // Шарик
-var BALL_SMALL_SIZE = 15;
-var BALL_NORMAL_SIZE = 25;
-var BALL_BIG_SIZE = 35;
-var BALL_DEFAULT_SPEED = 6;
-var BALL_MIN_SPEED = 2;
-var BALL_MAX_SPEED = 20; // Если увеличить то надо менять алгоритм расчета столкновений с блоками
-var BALL_SPEED_DELTA = 1;
-var BALL_START_ANGEL_MIN = 45 * Math.PI / 180;
-var BALL_START_ANGEL_MAX = 135 * Math.PI / 180;
-var BALL_MIN_HORIZONTAL_ANGEL_DELTA = 10 * Math.PI / 180;
+var BALL = {
+    defaultSpeed           : 6,
+    minSpeed               : 2,
+    maxSpeed               : 20,
+    deltaSpeed             : 1,
+    minStartAngel          : 45 * Math.PI / 180,
+    maxStartAngel          : 135 * Math.PI / 180,
+    minHorizontalAngelDelta: 10 * Math.PI / 180,
+    defaultSize            : 'normal',
+    size                   : {
+        small : 15,
+        normal: 25,
+        big   : 35
+    },
+    sprites                : {
+        small : { top: 0, left: 70, width: 15, height: 15 },
+        normal: { top: 0, left: 40, width: 25, height: 25 },
+        big   : { top: 0, left: 0, width: 35, height: 35 }
+    }
+};
 
-// Палка
-var PAD_CORNER_WIDTH = 10;
-var PAD_MIDDLE_WIDTH = 10;
-var PAD_HEIGHT = 20;
-var PAD_DEFAULT_SIZE = 8;
-var PAD_MAX_SIZE = 20;
-var PAD_MOVE_DELTA = 15;
-var PAD_MIN_SIZE = 0;
+// Палка ловилка
+var PAD = {
+    sizeWidth  : 10,
+    height     : 29,
+    maxSize    : 20,
+    minSize    : 2,
+    defaultSize: 10,
+    moveDelta  : 15,
+    sprite     : { width: 220, height: 29, top: 76, left: 0 }
+};
 
 // Бонусы
 var BONUS = {
@@ -51,17 +96,17 @@ var BONUS = {
 
 // Кирпичи
 var BRICK = {
-    width  : 50,
-    height : 25,
+    width             : 50,
+    height            : 25,
     metalWallThickness: 7,
-    lives  : {
+    lives             : {
         0: 1,
         1: 2,
         2: 3,
         3: 1,
         4: 1
     },
-    sprites: {
+    sprites           : {
         bricks    : {
             0: { width: 50, height: 25, top: 150, left: 0 },
             1: { width: 50, height: 25, top: 150, left: 50 },
@@ -80,62 +125,39 @@ var BRICK = {
     }
 };
 
-var DEVICE_KEYBOARD = 1;
-var DEVICE_MOUSE = 2;
-
-var LEFT = 1;
-var RIGHT = 2;
-var TOP = 3;
-var BOT = 4;
-
-var SAVE_DATA_KEY = 'arSaveData';
-
-var LEVELS_COUNT = 2;
-var LEVELS = [];
-
-var BUTTON_TYPE_START = 1;
-var BUTTON_TYPE_PAUSE = 2;
-var BUTTON_TYPE_SAVE = 3;
-var BUTTON_TYPE_LOAD = 4;
-var BUTTON_WIDTH = 100;
-var BUTTON_HEIGHT = 30;
-var BUTTONS_LEFT = 825;
-
-var BUTTONS_TOP = [];
-BUTTONS_TOP[BUTTON_TYPE_START] = 10;
-BUTTONS_TOP[BUTTON_TYPE_PAUSE] = 50;
-BUTTONS_TOP[BUTTON_TYPE_SAVE] = 90;
-BUTTONS_TOP[BUTTON_TYPE_LOAD] = 130;
-
-var BUTTONS_LABEL = [];
-BUTTONS_LABEL[BUTTON_TYPE_START] = 'Новая игра';
-BUTTONS_LABEL[BUTTON_TYPE_PAUSE] = 'Пауза (P)';
-BUTTONS_LABEL[BUTTON_TYPE_SAVE] = 'Сохранить';
-BUTTONS_LABEL[BUTTON_TYPE_LOAD] = 'Загрузить';
-
-var MESSAGE_GREETING = 'Arheynoid';
-var MESSAGE_PRESS_START = 'Нажмите новая игра';
-
-///////////////////////////////////////////////////////////////////
-var SPRITE_BUTTONS = [];
-SPRITE_BUTTONS[BUTTON_TYPE_START] = { left: 0, top: 40, width: BUTTON_WIDTH, height: BUTTON_HEIGHT };
-SPRITE_BUTTONS[BUTTON_TYPE_PAUSE] = { left: 100, top: 40, width: BUTTON_WIDTH, height: BUTTON_HEIGHT };
-SPRITE_BUTTONS[BUTTON_TYPE_SAVE] = { left: 200, top: 40, width: BUTTON_WIDTH, height: BUTTON_HEIGHT };
-SPRITE_BUTTONS[BUTTON_TYPE_LOAD] = { left: 300, top: 40, width: BUTTON_WIDTH, height: BUTTON_HEIGHT };
-
-var SPRITE_BALL = [];
-SPRITE_BALL[BALL_SMALL_SIZE] = { left: 70, top: 0, width: BALL_SMALL_SIZE, height: BALL_SMALL_SIZE };
-SPRITE_BALL[BALL_NORMAL_SIZE] = { left: 40, top: 0, width: BALL_NORMAL_SIZE, height: BALL_NORMAL_SIZE };
-SPRITE_BALL[BALL_BIG_SIZE] = { left: 0, top: 0, width: BALL_BIG_SIZE, height: BALL_BIG_SIZE };
-
-var SPRITE_ARRAY_PAD = {
-    leftCorner : {
-        left: 0, top: 80, width: PAD_CORNER_WIDTH, height: PAD_HEIGHT
+// Кнопки
+var BUTTONS = {
+    types: ['start', 'pause', 'save', 'load'],
+    start: {
+        left  : 25,
+        top   : 10,
+        height: 30,
+        width : 100,
+        label : 'Новая игра',
+        sprite: { left: 0, top: 40, width: 100, height: 30 }
     },
-    rightCorner: {
-        left: 20, top: 80, width: PAD_CORNER_WIDTH, height: PAD_HEIGHT
+    pause: {
+        left  : 25,
+        top   : 50,
+        height: 30,
+        width : 100,
+        label : 'Пауза (P)',
+        sprite: { left: 100, top: 40, width: 100, height: 30 }
     },
-    middle     : {
-        left: 10, top: 80, width: PAD_MIDDLE_WIDTH, height: PAD_HEIGHT
+    save : {
+        left  : 25,
+        top   : 90,
+        height: 30,
+        width : 100,
+        label : 'Сохранить',
+        sprite: { left: 200, top: 40, width: 100, height: 30 }
+    },
+    load : {
+        left  : 25,
+        top   : 130,
+        height: 30,
+        width : 100,
+        label : 'Загрузить',
+        sprite: { left: 300, top: 40, width: 100, height: 30 }
     }
 };

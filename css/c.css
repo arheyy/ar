@@ -1,51 +1,53 @@
-*{
-    margin:0;
-    padding:0;
+* {
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    min-height:1000px;
+    min-height: 1000px;
 }
 
 #container {
-    width:100%;
-    display:block;
+    width: 100%;
+    display: block;
 }
 
 #game-cont {
-    position:relative;
-    height:600px;
-    width:800px;
+    position: relative;
+    height: 600px;
+    width: 950px;
     margin: 0 auto;
 }
 
 #buttons {
     position: absolute;
-    width:60px;
+    width: 60px;
 }
+
 #buttons button {
-    width:100px;
-    height:30px;
+    width: 100px;
+    height: 30px;
 }
 
 #scene {
     /*background-image:url("1.jpg");*/
     background-color: #C7D7DB;
-    position:relative;
+    position: relative;
     /*cursor: none;*/
 }
 
 #fps {
     position: absolute;
-    right:0;
-    bottom:0;
-    font-size:8px;
-    color:white;
+    right: 0;
+    bottom: 0;
+    font-size: 8px;
+    color: white;
 }
+
 #frame-counter {
     position: absolute;
-    right:50px;
-    bottom:0;
-    font-size:8px;
-    color:white;
+    right: 50px;
+    bottom: 0;
+    font-size: 8px;
+    color: white;
 }

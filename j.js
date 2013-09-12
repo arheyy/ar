@@ -1,34 +1,31 @@
 var Ar = function (contId) {
     var bgCanvas = $('<canvas/>')
-            .attr('width', PG_WIDTH)
-            .attr('height', CONTEXT_HEIGHT)
-            .css({position: 'absolute'})
-        ;
-
+        .attr('width', BG_WIDTH + SIDEBAR_WIDTH)
+        .attr('height', BG_HEIGHT)
+        .css({position: 'absolute'});
     $(contId).append(bgCanvas);
-
     this.bgContext = bgCanvas[0].getContext('2d');
 
     var bricksCanvas = $('<canvas/>')
-            .attr('width', PG_WIDTH)
-            .attr('height', CONTEXT_HEIGHT)
-            .css({position: 'absolute'})
-        ;
-
+        .attr('width', PG_WIDTH)
+        .attr('height', PG_HEIGHT)
+        .css({position: 'absolute', left: BORDER.size + 'px', top: BORDER.size + 'px'});
     $(contId).append(bricksCanvas);
-
     this.bricksContext = bricksCanvas[0].getContext('2d');
 
     var mainCanvas = $('<canvas/>')
-            .attr('width', CONTEXT_WIDTH)
-            .attr('height', CONTEXT_HEIGHT)
-            .css({position: 'absolute'})
-        ;
-
+        .attr('width', PG_WIDTH)
+        .attr('height', PG_HEIGHT)
+        .css({position: 'absolute', left: BORDER.size + 'px', top: BORDER.size + 'px'});
     $(contId).append(mainCanvas);
-
-
     this.mainContext = mainCanvas[0].getContext('2d');
+
+    var ctrlCanvas = $('<canvas/>')
+        .attr('width', SIDEBAR_WIDTH)
+        .attr('height', PG_HEIGHT)
+        .css({position: 'absolute', left: PG_WIDTH + 'px'});
+    $(contId).append(ctrlCanvas);
+    this.ctrlContext = ctrlCanvas[0].getContext('2d');
 
     this.mainCanvasLeft = mainCanvas.offset().left;
     this.mainCanvasTop = mainCanvas.offset().top;
@@ -55,6 +52,7 @@ var Ar = function (contId) {
     this.bricksUpdated = true;
 
     this.background = new Image();
+    this.backImage = new Image();
 
     this.level = 1;
     this.levelData = null;
@@ -65,15 +63,27 @@ var Ar = function (contId) {
 Ar.prototype = {
 
     startScreen: function () {
-        this.screenMessage = MESSAGE_GREETING;
-        this.hintMessage = MESSAGE_PRESS_START;
+        this.screenMessage = MESSAGES['greeting'];
+        this.hintMessage = MESSAGES['pressStart'];
         this.resetObjects();
 
-        this.background.src = SPRITE_BACKGROUND_1;
         var self = this;
+
+        this.background.src = IMAGE_BACKGROUND;
+        this.background.onload = function () {
+            this.loaded = true;
+            self.drawBackground();
+        };
+
+        this.backImage.src = 'img/back.png';
+        this.backImage.onload = function () {
+            this.loaded = true;
+            self.drawBackground();
+        };
+
         SPRITESHEET.src = SPRITESHEET_SRC;
         SPRITESHEET.onload = function () {
-            self.drawBackground();
+
             self.createButtons();
             requestAnimationFrame(self.animate);
             self.startNewGame();
@@ -88,37 +98,87 @@ Ar.prototype = {
     },
 
     drawBackground: function () {
-        this.bgContext.drawImage(this.background, 0, 0, 800, 600, 0, 0, 800, 600);
+        if (this.background.loaded && !this.background.rendered) {
 
-        if (this.screenMessage) {
-            this.bgContext.font = "italic 50pt Arial";
-            this.bgContext.textBaseline = "middle";
-            this.bgContext.textAlign = "center";
-            this.bgContext.fillStyle = '#00FF66';
-            this.bgContext.fillText(this.screenMessage, PG_WIDTH / 2, CONTEXT_HEIGHT / 2);
+            this.bgContext.drawImage(this.background, 0, 0, 800, 600, BORDER.size, BORDER.size, 800, 600);
+            this.drawBorder();
+            this.background.rendered = true;
+
+            if (this.screenMessage) {
+                this.bgContext.font = "italic 50pt Arial";
+                this.bgContext.textBaseline = "middle";
+                this.bgContext.textAlign = "center";
+                this.bgContext.fillStyle = '#00FF66';
+                this.bgContext.fillText(this.screenMessage, PG_WIDTH / 2, PG_HEIGHT / 2);
+            }
+
+            if (this.hintMessage) {
+                this.bgContext.font = "italic 20pt Arial";
+                this.bgContext.textBaseline = "middle";
+                this.bgContext.textAlign = "center";
+                this.bgContext.fillStyle = '#00FF66';
+                this.bgContext.fillText(this.hintMessage, PG_WIDTH / 2, PG_HEIGHT / 2 + 150);
+            }
         }
 
-        if (this.hintMessage) {
-            this.bgContext.font = "italic 20pt Arial";
-            this.bgContext.textBaseline = "middle";
-            this.bgContext.textAlign = "center";
-            this.bgContext.fillStyle = '#00FF66';
-            this.bgContext.fillText(this.hintMessage, PG_WIDTH / 2, CONTEXT_HEIGHT / 2 + 150);
-        }
+//        if (this.sidebarBackground.loaded && !this.sidebarBackground.rendered) {
+//            this.sidebarBackground.rendered = true;
+//            this.bgContext.drawImage(this.sidebarBackground, 0, 0, SIDEBAR_WIDTH, PG_HEIGHT, PG_WIDTH, 0, SIDEBAR_WIDTH, PG_HEIGHT);
+//        }
+    },
+
+    drawBorder: function() {
+        this.bgContext.drawImage(this.backImage,
+            BORDER.sprites.LEFT.left,
+            BORDER.sprites.LEFT.top,
+            BORDER.sprites.LEFT.width,
+            BORDER.sprites.LEFT.height,
+            0,
+            BORDER.size,
+            BORDER.sprites.LEFT.width,
+            BORDER.sprites.LEFT.height
+        );
+        this.bgContext.drawImage(this.backImage,
+            BORDER.sprites.RIGHT.left,
+            BORDER.sprites.RIGHT.top,
+            BORDER.sprites.RIGHT.width,
+            BORDER.sprites.RIGHT.height,
+            BORDER.size + PG_WIDTH,
+            BORDER.size,
+            BORDER.sprites.RIGHT.width,
+            BORDER.sprites.RIGHT.height
+        );
+
+        this.bgContext.save();
+        //this.bgContext.translate(BG_WIDTH / 2, 0);
+        this.bgContext.rotate(Math.PI / 2);
+
+        this.bgContext.drawImage(this.backImage,
+            BORDER.sprites.TOP.left,
+            BORDER.sprites.TOP.top,
+            BORDER.sprites.TOP.width,
+            BORDER.sprites.TOP.height,
+            0,
+            BORDER.size,
+            BORDER.sprites.TOP.width,
+            BORDER.sprites.TOP.height
+        );
+
+        this.bgContext.restore();
     },
 
     createButtons: function () {
         var obj;
-        obj = new Button(BUTTON_TYPE_START);
+        obj = new Button('start');
         this.buttons.push(obj);
 
-        obj = new Button(BUTTON_TYPE_PAUSE);
+        obj = new Button('pause');
         this.buttons.push(obj);
 
-        obj = new Button(BUTTON_TYPE_SAVE);
+        obj = new Button('save');
         this.buttons.push(obj);
 
-        obj = new Button(BUTTON_TYPE_LOAD);
+        obj = new Button('load');
         this.buttons.push(obj);
 
         this.drawButtons();
@@ -126,7 +186,7 @@ Ar.prototype = {
 
     drawButtons: function () {
         for (var i = 0; i < this.buttons.length; i++) {
-            this.buttons[i].draw(this.mainContext);
+            this.buttons[i].draw(this.ctrlContext);
         }
     },
 
@@ -152,7 +212,7 @@ Ar.prototype = {
         this.levelData = LEVELS[this.level - 1];
     },
 
-    createPadObject: function (options) {
+    createPadObject : function (options) {
         this.pad = new Pad(options);
 
         return this.pad
@@ -196,7 +256,7 @@ Ar.prototype = {
         }
     },
 
-    drawBricks: function () {
+    drawBricks       : function () {
         for (var i = 0; i < this.bricks.length; i++) {
             this.bricks[i].draw(this.bricksContext);
         }
@@ -231,12 +291,12 @@ Ar.prototype = {
         }
 
         if (this.bricksUpdated) {
-            this.bricksContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
+            this.bricksContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
             this.updateBricks(now);
             this.drawBricks();
         }
 
-        this.mainContext.clearRect(0, 0, PG_WIDTH, CONTEXT_HEIGHT);
+        this.mainContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
 
         this.updateBalls();
         this.drawBalls();
@@ -249,7 +309,6 @@ Ar.prototype = {
             this.drawBonuses();
         }
     },
-
 
 
     updateBonuses: function (now) {
@@ -432,8 +491,8 @@ $(function () {
 
     window.onclick = function (event) {
         var point = new Point(event.pageX, event.pageY);
-        var pgRect = new Rect(ar.mainCanvasLeft, ar.mainCanvasTop, PG_WIDTH, CONTEXT_HEIGHT);
-        var ctrlRect = new Rect(ar.mainCanvasLeft + PG_WIDTH, ar.mainCanvasTop, CTRL_WIDTH, CONTEXT_HEIGHT);
+        var pgRect = new Rect(ar.mainCanvasLeft, ar.mainCanvasTop, PG_WIDTH, PG_HEIGHT);
+        var ctrlRect = new Rect(ar.mainCanvasLeft + PG_WIDTH, ar.mainCanvasTop, SIDEBAR_WIDTH, PG_HEIGHT);
 
         if (pointInObject(point, pgRect)) {
         } else if (pointInObject(point, ctrlRect)) {
@@ -443,7 +502,7 @@ $(function () {
 
 //    $('#buttons').css({
 //        top : $(ar.canvas).offset().top + 'px',
-//        left: ar.mainCanvasLeft + PG_WIDTH + CTRL_WIDTH + 'px'
+//        left: ar.mainCanvasLeft + PG_WIDTH + SIDEBAR_WIDTH + 'px'
 //    })
 
 });
