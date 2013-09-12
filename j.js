@@ -20,12 +20,12 @@ var Ar = function (contId) {
     $(contId).append(mainCanvas);
     this.mainContext = mainCanvas[0].getContext('2d');
 
-    var ctrlCanvas = $('<canvas/>')
+    var sidebarCanvas = $('<canvas/>')
         .attr('width', SIDEBAR_WIDTH)
         .attr('height', PG_HEIGHT)
-        .css({position: 'absolute', left: PG_WIDTH + 'px'});
-    $(contId).append(ctrlCanvas);
-    this.ctrlContext = ctrlCanvas[0].getContext('2d');
+        .css({position: 'absolute', left: BG_WIDTH + 'px'});
+    $(contId).append(sidebarCanvas);
+    this.sidebarContext = sidebarCanvas[0].getContext('2d');
 
     this.mainCanvasLeft = mainCanvas.offset().left;
     this.mainCanvasTop = mainCanvas.offset().top;
@@ -121,10 +121,10 @@ Ar.prototype = {
             }
         }
 
-//        if (this.sidebarBackground.loaded && !this.sidebarBackground.rendered) {
-//            this.sidebarBackground.rendered = true;
-//            this.bgContext.drawImage(this.sidebarBackground, 0, 0, SIDEBAR_WIDTH, PG_HEIGHT, PG_WIDTH, 0, SIDEBAR_WIDTH, PG_HEIGHT);
-//        }
+        if (this.backImage.loaded && !this.backImage.rendered) {
+            this.bgContext.drawImage(this.backImage, SIDEBAR.left, SIDEBAR.top, SIDEBAR.width, SIDEBAR.height, PG_WIDTH + 2 * BORDER.size, 0, SIDEBAR.width, SIDEBAR.height);
+            this.backImage.rendered = true;
+        }
     },
 
     drawBorder: function() {
@@ -150,8 +150,8 @@ Ar.prototype = {
         );
 
         this.bgContext.save();
-        //this.bgContext.translate(BG_WIDTH / 2, 0);
-        this.bgContext.rotate(Math.PI / 2);
+        this.bgContext.translate(0, BORDER.size);
+        this.bgContext.rotate(-Math.PI / 2);
 
         this.bgContext.drawImage(this.backImage,
             BORDER.sprites.TOP.left,
@@ -159,9 +159,26 @@ Ar.prototype = {
             BORDER.sprites.TOP.width,
             BORDER.sprites.TOP.height,
             0,
-            BORDER.size,
+            0,
             BORDER.sprites.TOP.width,
             BORDER.sprites.TOP.height
+        );
+
+        this.bgContext.restore();
+
+        this.bgContext.save();
+        this.bgContext.translate(0, PG_HEIGHT + BORDER.size * 2);
+        this.bgContext.rotate(-Math.PI / 2);
+
+        this.bgContext.drawImage(this.backImage,
+            BORDER.sprites.BOT.left,
+            BORDER.sprites.BOT.top,
+            BORDER.sprites.BOT.width,
+            BORDER.sprites.BOT.height,
+            0,
+            0,
+            BORDER.sprites.BOT.width,
+            BORDER.sprites.BOT.height
         );
 
         this.bgContext.restore();
@@ -186,7 +203,7 @@ Ar.prototype = {
 
     drawButtons: function () {
         for (var i = 0; i < this.buttons.length; i++) {
-            this.buttons[i].draw(this.ctrlContext);
+            this.buttons[i].draw(this.sidebarContext);
         }
     },
 
