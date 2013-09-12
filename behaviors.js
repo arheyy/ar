@@ -33,7 +33,7 @@ var moveBallBehavior = {
 
             var ang = Math.PI / 2 * (koeff + 1);
 
-            ball.setAng(ang)
+            ball.setAng(ang);
             return true;
         }
 
@@ -65,31 +65,31 @@ var moveBallBehavior = {
 
             if (horizontalIntersect.length && verticalIntersect.length) {
 
-                var kx = Math.abs(horizontalIntersect[0].x - verticalIntersect[0].x);
-                var ky = Math.abs(horizontalIntersect[0].y - verticalIntersect[0].y);
+                var kx = horizontalIntersect[0].x - verticalIntersect[0].x;
+                var ky = horizontalIntersect[0].y - verticalIntersect[0].y;
 
-                if (kx > ky) {
-
+                if (Math.abs(Math.abs(kx) - Math.abs(ky)) < 0.3) {
+                    ball.top += ky;
+                    ball.left -= kx;
+                    ball.invertYDirection();
+                    ball.invertXDirection();
+                    touchSide = [horizontalSide, verticalSide];
+                } else if (Math.abs(kx) >= Math.abs(ky)) {
+                    ball.top += ky;
                     ball.invertYDirection();
                     touchSide = horizontalSide;
-
                 } else {
-
+                    ball.left -= kx;
                     ball.invertXDirection();
                     touchSide = verticalSide;
-
                 }
 
             } else if (horizontalIntersect.length) {
-
                 ball.invertYDirection();
                 touchSide = horizontalSide;
-
             } else if (verticalIntersect.length) {
-
                 ball.invertXDirection();
                 touchSide = verticalSide;
-
             }
 
             if (touchSide !== false) {
@@ -147,7 +147,7 @@ var movePadBehavior = {
 
 var bonusBehavior = {
 
-    execute: function (bonus, time, fps) {
+    execute: function (bonus) {
         // Бонус не пойман
         if (bonus.top > CONTEXT_HEIGHT) {
             ar.removeBonus(bonus);
@@ -180,7 +180,7 @@ var bonusBehavior = {
                 ar.bonusDecreasePad();
                 break;
             case 'speedIncrease':
-                ar.bonusIncreaseSpeed()
+                ar.bonusIncreaseSpeed();
                 break;
             case 'speedDecrease':
                 ar.bonusDecreaseSpeed();

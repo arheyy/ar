@@ -9,13 +9,6 @@ var SPRITESHEET = new Image();
 var SPRITESHEET_SRC = 'img/sprites.png';
 var SPRITE_BACKGROUND_1 = 'img/background1.png';
 
-// Типы объектов
-var OBJECT_TYPE_BALL = 'ball';
-var OBJECT_TYPE_PAD = 'pad';
-var OBJECT_TYPE_BONUS = 'bonus';
-var OBJECT_TYPE_BRICK = 'brick';
-var OBJECT_TYPE_BUTTON = 'button';
-
 // Шарик
 var BALL_SMALL_SIZE = 15;
 var BALL_NORMAL_SIZE = 25;

@@ -120,13 +120,8 @@ function isBallVerticalIntersected(ball, line) {
 }
 
 function pointInObject(point, object) {
-    if (object.left < point.left
+    return object.left < point.left
         && object.left + object.width > point.left
         && object.top < point.top
-        && object.top + object.height > point.top
-        ) {
-        return true;
-    }
-
-    return false;
+        && object.top + object.height > point.top;
 }

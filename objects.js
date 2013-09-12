@@ -1,24 +1,13 @@
 var Ball = function (options) {
-    this.oType = OBJECT_TYPE_BALL;
     this.speed = options.speed || BALL_DEFAULT_SPEED;
     this.size = options.size || BALL_NORMAL_SIZE;
     this.width = this.size;
     this.height = this.size;
-//    options.ang = Math.PI * 90 / 180;
 
     this.left = options.left || (PG_WIDTH - BALL_NORMAL_SIZE) / 2;
     this.top = options.top || CONTEXT_HEIGHT - PAD_HEIGHT - BALL_NORMAL_SIZE;
     this.setAng(options.ang || rand(BALL_START_ANGEL_MIN, BALL_START_ANGEL_MAX));
     this.alive = true;
-//
-//    this.speed = 2;
-//    this.left = 330;
-//    this.top = 251;
-//    this.setAng(135 * Math.PI / 180);
-//    this.ang = 135 * Math.PI / 180;
-//    this.dx = -10;
-//    this.dy = -10;
-
 
     this.behaviors = [moveBallBehavior];
 
@@ -78,11 +67,11 @@ Ball.prototype = {
         this.top += this.dy;
     },
 
-    incSpeed: function() {
+    incSpeed: function () {
         this.setSpeed(this.speed + BALL_SPEED_DELTA);
     },
 
-    decSpeed: function() {
+    decSpeed: function () {
         this.setSpeed(this.speed - BALL_SPEED_DELTA);
     },
 
@@ -145,7 +134,6 @@ Ball.prototype = {
 
 var Pad = function (options) {
     options = options || {};
-    this.oType = OBJECT_TYPE_PAD;
     this.setSize(options.size || PAD_DEFAULT_SIZE);
     this.left = options.left || (PG_WIDTH - this.width) / 2;
     this.height = PAD_HEIGHT;
@@ -182,7 +170,6 @@ Pad.prototype = {
 };
 
 var Bonus = function (options) {
-    this.oType = OBJECT_TYPE_BONUS;
     this.type = options.type;
     this.width = BONUS.size;
     this.height = BONUS.size;
@@ -192,7 +179,7 @@ var Bonus = function (options) {
     this.alive = true;
 
     this.behaviors = [
-        bonusBehavior,
+        bonusBehavior
     ];
 
     this.sprites = [ new BonusSprite(this, BONUS.sprites) ];
@@ -219,7 +206,6 @@ Bonus.prototype = {
 };
 
 var Brick = function (options) {
-    this.oType = OBJECT_TYPE_BRICK;
     this.brickType = options.brickType;
     this.lives = BRICK.lives[this.brickType];
     this.health = this.lives;
@@ -227,6 +213,13 @@ var Brick = function (options) {
     this.height = BRICK.height;
     this.left = options.left;
     this.top = options.top;
+    this.lines = {
+        TOP  : { x1: this.left, y1: this.top, x2: this.left + this.width, y2: this.top },
+        BOT  : { x1: this.left, y1: this.top + this.height, x2: this.left + this.width, y2: this.top + this.height },
+        LEFT : { x1: this.left, y1: this.top, x2: this.left, y2: this.top + this.height },
+        RIGHT: { x1: this.left + this.width, y1: this.top, x2: this.left + this.width, y2: this.top + this.height }
+    };
+
     this.metalWalls = options.metalWalls || [];
     this.alive = true;
 
@@ -276,40 +269,20 @@ Brick.prototype = {
     getSideLine: function (side) {
         switch (side) {
             case TOP:
-                return {
-                    x1: this.left,
-                    y1: this.top,
-                    x2: this.left + this.width,
-                    y2: this.top
-                };
+                return this.lines['TOP'];
             case BOT:
-                return {
-                    x1: this.left,
-                    y1: this.top + this.height,
-                    x2: this.left + this.width,
-                    y2: this.top + this.height
-                };
+                return this.lines['BOT'];
             case LEFT:
-                return {
-                    x1: this.left,
-                    y1: this.top,
-                    x2: this.left,
-                    y2: this.top + this.height
-                };
+                return this.lines['LEFT'];
             case RIGHT:
-                return {
-                    x1: this.left + this.width,
-                    y1: this.top,
-                    x2: this.left + this.width,
-                    y2: this.top + this.height
-                };
+                return this.lines['RIGHT'];
         }
-    }
 
+        return {};
+    }
 };
 
 var Button = function (buttonType) {
-    this.oType = OBJECT_TYPE_BUTTON;
     this.buttonType = buttonType;
     this.width = BUTTON_WIDTH;
     this.height = BUTTON_HEIGHT;
@@ -319,7 +292,7 @@ var Button = function (buttonType) {
     this.state = false;
 
     this.sprites = [
-        new ButtonSprite(this, SPRITE_BUTTONS),
+        new ButtonSprite(this, SPRITE_BUTTONS)
     ];
 };
 

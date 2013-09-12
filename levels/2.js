@@ -1,1 +1,1 @@
-LEVELS.push([{"left":100,"top":325,"color":"green","lives":1,"metalWalls":[TOP, BOT, LEFT, RIGHT]}]);
+LEVELS.push([{"left":300,"top":350,"brickType":1,"metalWalls":[]}]);
