@@ -200,7 +200,7 @@ var ButtonSprite = function (object, cell) {
 ButtonSprite.prototype = {
     draw: function (context) {
         var cell = this.cell;
-        context.drawImage(SPRITESHEET, cell.left, cell.top,
+        context.drawImage(ar.backImage, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
             cell.width, cell.height);

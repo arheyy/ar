@@ -79,12 +79,12 @@ Ar.prototype = {
         this.backImage.onload = function () {
             this.loaded = true;
             self.drawBackground();
+            self.createButtons();
+            self.drawButtons()
         };
 
         SPRITESHEET.src = SPRITESHEET_SRC;
         SPRITESHEET.onload = function () {
-
-            self.createButtons();
             requestAnimationFrame(self.animate);
             self.startNewGame();
         }
@@ -122,7 +122,15 @@ Ar.prototype = {
         }
 
         if (this.backImage.loaded && !this.backImage.rendered) {
-            this.bgContext.drawImage(this.backImage, SIDEBAR.left, SIDEBAR.top, SIDEBAR.width, SIDEBAR.height, PG_WIDTH + 2 * BORDER.size, 0, SIDEBAR.width, SIDEBAR.height);
+            this.bgContext.drawImage(this.backImage,
+                SIDEBAR.sprite.left,
+                SIDEBAR.sprite.top,
+                SIDEBAR.sprite.width,
+                SIDEBAR.sprite.height,
+                SIDEBAR.left,
+                SIDEBAR.top,
+                SIDEBAR.width,
+                SIDEBAR.height);
             this.backImage.rendered = true;
         }
     },
@@ -197,13 +205,11 @@ Ar.prototype = {
 
         obj = new Button('load');
         this.buttons.push(obj);
-
-        this.drawButtons();
     },
 
     drawButtons: function () {
         for (var i = 0; i < this.buttons.length; i++) {
-            this.buttons[i].draw(this.sidebarContext);
+            this.buttons[i].draw(this.bgContext);
         }
     },
 

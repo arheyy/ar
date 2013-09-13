@@ -39,7 +39,7 @@ var BORDER = {
 
 var SIDEBAR = {
     width: 150,
-    height: 600,
+    height: 660,
     left: 860,
     top: 0,
     sprite: { top: 0, left: 120, width: 150, height: 600 }
@@ -137,35 +137,35 @@ var BRICK = {
 var BUTTONS = {
     types: ['start', 'pause', 'save', 'load'],
     start: {
-        left: 25,
+        left: 885,
         top: 10,
         height: 30,
         width: 100,
         label: 'Новая игра',
-        sprite: { left: 0, top: 40, width: 100, height: 30 }
+        sprite: { left: 270, top: 0, width: 100, height: 30 }
     },
     pause: {
-        left: 25,
+        left: 885,
         top: 50,
         height: 30,
         width: 100,
         label: 'Пауза (P)',
-        sprite: { left: 100, top: 40, width: 100, height: 30 }
+        sprite: { left: 270, top: 120, width: 100, height: 30 }
     },
     save: {
-        left: 25,
+        left: 885,
         top: 90,
         height: 30,
         width: 100,
         label: 'Сохранить',
-        sprite: { left: 200, top: 40, width: 100, height: 30 }
+        sprite: { left: 270, top: 180, width: 100, height: 30 }
     },
     load: {
-        left: 25,
+        left: 885,
         top: 130,
         height: 30,
         width: 100,
         label: 'Загрузить',
-        sprite: { left: 300, top: 40, width: 100, height: 30 }
+        sprite: { left: 270, top: 240, width: 100, height: 30 }
     }
 };
