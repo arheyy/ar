@@ -15,7 +15,7 @@ body {
 #game-cont {
     position: relative;
     height: 600px;
-    width: 950px;
+    width: 1010px;
     margin: 0 auto;
 }
 
@@ -30,10 +30,8 @@ body {
 }
 
 #scene {
-    /*background-image:url("1.jpg");*/
     background-color: #C7D7DB;
     position: relative;
-    /*cursor: none;*/
 }
 
 #fps {
@@ -50,4 +48,13 @@ body {
     bottom: 0;
     font-size: 8px;
     color: white;
+}
+
+canvas.activeButton {
+    cursor: pointer;
+}
+
+@font-face {
+    font-family: 'Ar';
+    src: url('../ar.ttf');
 }

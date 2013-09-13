@@ -1,34 +1,36 @@
 var Ar = function (contId) {
-    var bgCanvas = $('<canvas/>')
-        .attr('width', BG_WIDTH + SIDEBAR_WIDTH)
+    this.bgCanvas = $('<canvas/>')
+        .attr('width', BG_WIDTH)
         .attr('height', BG_HEIGHT)
         .css({position: 'absolute'});
-    $(contId).append(bgCanvas);
-    this.bgContext = bgCanvas[0].getContext('2d');
+    $(contId).append(this.bgCanvas);
+    this.bgContext = this.bgCanvas[0].getContext('2d');
+    this.bgCanvasLeft = this.bgCanvas.offset().left;
+    this.bgCanvasTop = this.bgCanvas.offset().top;
 
-    var bricksCanvas = $('<canvas/>')
+    this.bricksCanvas = $('<canvas/>')
         .attr('width', PG_WIDTH)
         .attr('height', PG_HEIGHT)
         .css({position: 'absolute', left: BORDER.size + 'px', top: BORDER.size + 'px'});
-    $(contId).append(bricksCanvas);
-    this.bricksContext = bricksCanvas[0].getContext('2d');
+    $(contId).append(this.bricksCanvas);
+    this.bricksContext = this.bricksCanvas[0].getContext('2d');
 
-    var mainCanvas = $('<canvas/>')
+    this.mainCanvas = $('<canvas/>')
         .attr('width', PG_WIDTH)
         .attr('height', PG_HEIGHT)
         .css({position: 'absolute', left: BORDER.size + 'px', top: BORDER.size + 'px'});
-    $(contId).append(mainCanvas);
-    this.mainContext = mainCanvas[0].getContext('2d');
+    $(contId).append(this.mainCanvas);
+    this.mainContext = this.mainCanvas[0].getContext('2d');
 
-    var sidebarCanvas = $('<canvas/>')
+    this.mainCanvasLeft = this.mainCanvas.offset().left;
+    this.mainCanvasTop = this.mainCanvas.offset().top;
+
+    this.sidebarCanvas = $('<canvas/>')
         .attr('width', SIDEBAR_WIDTH)
-        .attr('height', PG_HEIGHT)
-        .css({position: 'absolute', left: BG_WIDTH + 'px'});
-    $(contId).append(sidebarCanvas);
-    this.sidebarContext = sidebarCanvas[0].getContext('2d');
-
-    this.mainCanvasLeft = mainCanvas.offset().left;
-    this.mainCanvasTop = mainCanvas.offset().top;
+        .attr('height', BG_HEIGHT)
+        .css({position: 'absolute', left: BG_WIDTH - SIDEBAR_WIDTH + 'px'});
+    $(contId).append(this.sidebarCanvas);
+    this.sidebarContext = this.sidebarCanvas[0].getContext('2d');
 
     this.fpsElement = document.getElementById('fps');
 
@@ -57,6 +59,8 @@ var Ar = function (contId) {
     this.level = 1;
     this.levelData = null;
 
+    this.score = 0;
+
     this.lives = DEFAULT_LIVES_AMOUNT;
 };
 
@@ -72,15 +76,12 @@ Ar.prototype = {
         this.background.src = IMAGE_BACKGROUND;
         this.background.onload = function () {
             this.loaded = true;
-            self.drawBackground();
         };
 
-        this.backImage.src = 'img/back.png';
+        this.backImage.src = IMAGE_BACK;
         this.backImage.onload = function () {
             this.loaded = true;
-            self.drawBackground();
             self.createButtons();
-            self.drawButtons()
         };
 
         SPRITESHEET.src = SPRITESHEET_SRC;
@@ -98,11 +99,10 @@ Ar.prototype = {
     },
 
     drawBackground: function () {
-        if (this.background.loaded && !this.background.rendered) {
+        if (this.background.loaded && !this.background.actual) {
 
             this.bgContext.drawImage(this.background, 0, 0, 800, 600, BORDER.size, BORDER.size, 800, 600);
             this.drawBorder();
-            this.background.rendered = true;
 
             if (this.screenMessage) {
                 this.bgContext.font = "italic 50pt Arial";
@@ -119,9 +119,11 @@ Ar.prototype = {
                 this.bgContext.fillStyle = '#00FF66';
                 this.bgContext.fillText(this.hintMessage, PG_WIDTH / 2, PG_HEIGHT / 2 + 150);
             }
+
+            this.background.actual = true;
         }
 
-        if (this.backImage.loaded && !this.backImage.rendered) {
+        if (this.backImage.loaded && !this.backImage.actual) {
             this.bgContext.drawImage(this.backImage,
                 SIDEBAR.sprite.left,
                 SIDEBAR.sprite.top,
@@ -131,11 +133,24 @@ Ar.prototype = {
                 SIDEBAR.top,
                 SIDEBAR.width,
                 SIDEBAR.height);
-            this.backImage.rendered = true;
+
+            this.bgContext.drawImage(this.backImage,
+                FRAME.sprite.left,
+                FRAME.sprite.top,
+                FRAME.sprite.width,
+                FRAME.sprite.height,
+                FRAME.left,
+                FRAME.top,
+                FRAME.width,
+                FRAME.height);
+
+            this.drawButtons();
+
+            this.backImage.actual = true;
         }
     },
 
-    drawBorder: function() {
+    drawBorder: function () {
         this.bgContext.drawImage(this.backImage,
             BORDER.sprites.LEFT.left,
             BORDER.sprites.LEFT.top,
@@ -192,6 +207,15 @@ Ar.prototype = {
         this.bgContext.restore();
     },
 
+    drawScore: function () {
+        this.sidebarContext.clearRect(SCORE.clearRect.left, SCORE.clearRect.top, SCORE.clearRect.width, SCORE.clearRect.height);
+        this.sidebarContext.font = SCORE.font;
+        this.sidebarContext.textBaseline = "middle";
+        this.sidebarContext.textAlign = "center";
+        this.sidebarContext.fillStyle = SCORE.fillStyle;
+        this.sidebarContext.fillText('' + this.score, SCORE.left, SCORE.top);
+    },
+
     createButtons: function () {
         var obj;
         obj = new Button('start');
@@ -218,7 +242,7 @@ Ar.prototype = {
         this.screenMessage = null;
         this.hintMessage = null;
 
-        this.drawBackground();
+        this.score = 0;
         this.resetObjects();
         this.loadLevel();
         this.createPadObject();
@@ -235,13 +259,14 @@ Ar.prototype = {
         this.levelData = LEVELS[this.level - 1];
     },
 
-    createPadObject : function (options) {
+    createPadObject: function (options) {
         this.pad = new Pad(options);
 
         return this.pad
     },
 
     // Ball
+
     createBallObject: function (options) {
         options = options || {};
         var obj = new Ball(options);
@@ -267,27 +292,8 @@ Ar.prototype = {
         }
     },
 
-    updateBricks: function (now) {
-        var brick;
-        for (var i = 0; i < this.bricks.length; i++) {
-            brick = this.bricks[i];
-            brick.update(now);
-            if (!brick.alive) {
-                this.generateBonus(brick);
-                this.bricks.splice(i, 1);
-            }
-        }
-    },
-
-    drawBricks       : function () {
-        for (var i = 0; i < this.bricks.length; i++) {
-            this.bricks[i].draw(this.bricksContext);
-        }
-
-        this.bricksUpdated = false;
-    },
-
     // Brick
+
     createBrickObject: function (options) {
         var obj = new Brick(options);
         this.bricks.push(obj);
@@ -295,44 +301,39 @@ Ar.prototype = {
         return obj;
     },
 
+    updateBricks: function (now) {
+        var brick;
+        var res = false;
+        for (var i = 0; i < this.bricks.length; i++) {
+            brick = this.bricks[i];
+            brick.update(now);
+            if (!brick.alive) {
+                this.updateScore();
+                this.generateBonus(brick);
+                this.bricks.splice(i, 1);
+                res = true;
+            }
+        }
+
+        return res;
+    },
+
+    drawBricks: function () {
+        for (var i = 0; i < this.bricks.length; i++) {
+            this.bricks[i].draw(this.bricksContext);
+        }
+
+        this.bricksUpdated = false;
+    },
+
+    // Bonus
+
     createBonusObject: function (options) {
         var obj = new Bonus(options);
         this.bonuses.push(obj);
 
         return obj;
     },
-
-    animate: function (now) {
-        ar.fps = ar.calculateFps(now);
-        ar.draw(now);
-        requestAnimationFrame(ar.animate);
-    },
-
-    draw: function (now) {
-        if (ar.gamePaused) {
-            return;
-        }
-
-        if (this.bricksUpdated) {
-            this.bricksContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
-            this.updateBricks(now);
-            this.drawBricks();
-        }
-
-        this.mainContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
-
-        this.updateBalls();
-        this.drawBalls();
-
-        this.pad.update(now);
-        this.pad.draw(this.mainContext);
-
-        if (this.bonuses.length) {
-            this.updateBonuses();
-            this.drawBonuses();
-        }
-    },
-
 
     updateBonuses: function (now) {
         var bonus;
@@ -373,23 +374,88 @@ Ar.prototype = {
         });
     },
 
+    animate: function (now) {
+        ar.fps = ar.calculateFps(now);
+        ar.draw(now);
+        requestAnimationFrame(ar.animate);
+    },
+
+    draw: function (now) {
+        this.drawBackground();
+        this.drawScore();
+
+        if (ar.gamePaused) {
+            return;
+        }
+
+        this.mainContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
+
+        this.updateBalls();
+        this.drawBalls();
+
+        this.pad.update(now);
+        this.pad.draw(this.mainContext);
+
+        if (this.bonuses.length) {
+            this.updateBonuses();
+            this.drawBonuses();
+        }
+
+        if (this.updateBricks(now) || this.bricksUpdated) {
+            this.bricksContext.clearRect(0, 0, PG_WIDTH, PG_HEIGHT);
+            this.drawBricks();
+        }
+    },
+
+    updateScore: function () {
+        var ballScore = this.balls[0].speed - BALL.defaultSpeed;
+        var padScore = PAD.defaultSize - this.pad.size;
+        this.score += SCORE.base + ballScore + padScore;
+    },
+
 ///////////////////////////////////////////////////////////////////////
 
-    processControlPanelClick: function (point) {
+    processSidebarMouseMove: function (point) {
+        var touch = false;
+        var hasActiveButton = false;
+        for (var i = 0; i < this.buttons.length; i++) {
+            var button = this.buttons[i];
+
+            hasActiveButton = hasActiveButton || button.active;
+
+            if (pointInObject(point, button)) {
+                this.bgCanvas.addClass('activeButton');
+                button.active = true;
+                touch = true;
+            } else {
+                button.active = false;
+            }
+        }
+
+        if (touch) {
+            this.bgCanvas.addClass('activeButton');
+            this.drawButtons();
+        } else if (hasActiveButton) {
+            this.bgCanvas.removeClass('activeButton');
+            this.drawButtons();
+        }
+    },
+
+    processSidebarClick: function (point) {
         for (var i = 0; i < this.buttons.length; i++) {
             var button = this.buttons[i];
 
             if (pointInObject(point, button)) {
-                switch (button.buttonType) {
-                    case BUTTON_TYPE_START:
+                switch (button.type) {
+                    case 'start':
                         this.startNewGame();
                         break;
-                    case BUTTON_TYPE_PAUSE:
+                    case 'pause':
                         this.gamePaused = !this.gamePaused;
                         break;
-                    case BUTTON_TYPE_SAVE:
+                    case 'save':
                         break;
-                    case BUTTON_TYPE_LOAD:
+                    case 'load':
                         break;
                 }
 
@@ -400,15 +466,6 @@ Ar.prototype = {
 
 
 ///////////////////////////////////////////////////////////////////////
-//
-//    removeTypedObject: function (arr, obj) {
-//        for (var i = 0; i < arr.length; i++) {
-//
-//            if (arr[i] === obj) {
-//                arr.splice(i, 1);
-//            }
-//        }
-//    },
 
     calculateFps: function (now) {
         var fps = 1000 / (now - this.lastAnimationFrameTime);
@@ -504,6 +561,16 @@ $(function () {
     };
 
     window.onmousemove = function (event) {
+        if (event.pageX > ar.bgCanvasLeft + BG_WIDTH - SIDEBAR_WIDTH
+            && event.pageX < ar.bgCanvasLeft + BG_WIDTH
+            && event.pageY > ar.bgCanvasTop
+            && event.pageY < ar.bgCanvasTop + BG_HEIGHT
+            ) {
+
+            ar.processSidebarMouseMove(new Point(event.pageX - ar.bgCanvasLeft, event.pageY - ar.bgCanvasTop));
+
+        }
+
         if (!ar.gameStarted || ar.gamePaused) {
             return;
         }
@@ -515,11 +582,12 @@ $(function () {
     window.onclick = function (event) {
         var point = new Point(event.pageX, event.pageY);
         var pgRect = new Rect(ar.mainCanvasLeft, ar.mainCanvasTop, PG_WIDTH, PG_HEIGHT);
-        var ctrlRect = new Rect(ar.mainCanvasLeft + PG_WIDTH, ar.mainCanvasTop, SIDEBAR_WIDTH, PG_HEIGHT);
+        var sidebarRect = new Rect(ar.bgCanvasLeft + BG_WIDTH - SIDEBAR_WIDTH, ar.bgCanvasTop, SIDEBAR_WIDTH, BG_HEIGHT);
 
         if (pointInObject(point, pgRect)) {
-        } else if (pointInObject(point, ctrlRect)) {
-            ar.processControlPanelClick(new Point(event.pageX - ar.mainCanvasLeft, event.pageY - ar.mainCanvasTop));
+
+        } else if (pointInObject(point, sidebarRect)) {
+            ar.processSidebarClick(new Point(event.pageX - ar.bgCanvasLeft, event.pageY - ar.bgCanvasTop));
         }
     };
 

@@ -291,17 +291,17 @@ Brick.prototype = {
     }
 };
 
-var Button = function (buttonType) {
-    this.buttonType = buttonType;
-    this.width = BUTTONS[this.buttonType].width;
-    this.height = BUTTONS[this.buttonType].height;
-    this.left = BUTTONS[this.buttonType].left;
-    this.top = BUTTONS[this.buttonType].top;
-    this.label = BUTTONS[this.buttonType].label;
-    this.state = false;
+var Button = function (type) {
+    this.type = type;
+    this.width = BUTTONS[this.type].width;
+    this.height = BUTTONS[this.type].height;
+    this.left = BUTTONS[this.type].left;
+    this.top = BUTTONS[this.type].top;
+    this.label = BUTTONS[this.type].label;
+    this.active = false;
 
     this.sprites = [
-        new ButtonSprite(this, BUTTONS[this.buttonType].sprite)
+        new ButtonSprite(this, BUTTONS[this.type].sprite)
     ];
 };
 

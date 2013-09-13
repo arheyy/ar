@@ -199,7 +199,8 @@ var ButtonSprite = function (object, cell) {
 
 ButtonSprite.prototype = {
     draw: function (context) {
-        var cell = this.cell;
+        var cell = this.object.active ? this.cell.hover : this.cell.normal;
+
         context.drawImage(ar.backImage, cell.left, cell.top,
             cell.width, cell.height,
             this.object.left, this.object.top,
